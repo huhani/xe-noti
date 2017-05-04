@@ -1,0 +1,11 @@
+<query id="getNotiInfoByMemberSrl" action="select">
+	<tables>
+		<table name="noti" />
+	</tables>
+	<columns>
+		<column name="*" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="member_srl" var="member_srl" notnull="notnull" />
+	</conditions>
+</query>

@@ -1,0 +1,131 @@
+{@
+	Context::addHtmlHeader('<link rel=manifest href=./manifest.json>');
+}
+
+<load target="./css/mypage.css" />
+<load target="https://cdn.jsdelivr.net/fontawesome/4.2.0/css/font-awesome.min.css" />
+<load target="./js/dev_list.js" />
+
+<load target="./js/notification.js" />
+
+<div id="noti_mypage" class="noti_bd">
+
+<div id="noti_table">
+<table class="table table-striped table-hover">
+
+	<caption>
+<!--//
+		<a href="javascript:;" onclick="initServiceWorker()">구독</a>
+		<a href="javascript:;" onclick="unsubscribeDevice()">해제</a>
+-->
+	</caption>
+
+	<thead>
+
+		<tr>
+			<th>
+				<span>번호</span>
+			</th>
+
+			<th style="display:none;">
+				<span>USER AGENT</span>
+			</th>
+
+			<th>
+				<span>브라우저</span>
+			</th>
+
+			<th>
+				<span>등록 IP</span>
+			</th>
+
+			<th>
+				<span>마지막 수신일</span>
+			</th>
+
+			<th>
+				<span>마지막 발송일</span>
+			</th>
+
+			<th>
+				<span>등록일</span>
+			</th>
+
+			<th>
+				<span>설정</span>
+			</th>
+		</tr>
+
+	</thead>
+
+	<tbody>
+		<tr loop="$noti => $no, $noti">
+
+			<td>
+				<span>{$no}</span>
+			</td>
+
+			<td style="display:none;">
+				<span class="noti_title">{cut_str($noti->user_agent, 40)}</span></a>
+			</td>
+
+			<td>
+				<span>{$noti->browser} ({$noti->platform})</span>
+			</td>
+
+			<td>
+				<span>{$noti->ipaddress}</span>
+			</td>
+
+			<td>
+				<span>{zdate($noti->recv_date, "Y.m.d H:i:s")}</span>
+			</td>
+
+			<td>
+				<span>{zdate($noti->last_post, "Y.m.d H:i:s")}</span>
+			</td>
+
+			<td>
+				<span>{zdate($noti->regdate, "Y.m.d H:i")}</span>
+			</td>
+
+
+			<td>
+				<a href="javascript:;" class="noti_lnk noti_delete" title="삭제" data-src="{$noti->reg_srl}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+			</td>
+
+		</tr>
+
+	</tbody>
+</table>
+<div class="empty_list" style="display:block"|cond="empty($noti)">
+	등록된 단말기가 없습니다.
+</div>
+
+</div>
+<div class="noti_table_bottom clear">
+	<div class="fl">
+		<button class="subscribe d_btn">
+			<i class="fa fa-bell-slash-o" aria-hidden="true"></i> 알림 <span class="status"> 상태 로딩중</span>
+		</button>
+	</div>
+
+	<div class="fr">
+		<button class="unsubscribe_all d_btn">
+			<i class="fa fa-times" aria-hidden="true"></i> 등록된 단말기 모두 알림 해제</span>
+		</button>
+	</div>
+
+</div>
+
+<div class="text-center">
+	<ul class="pagination">
+		<li><a href="{getUrl('page','','module_srl','')}">&laquo; 첫 페이지</a></li>
+		<!--@while($page_no = $page_navigation->getNextPage())-->
+		<li class="active"|cond="$page == $page_no || (!$page && $page_no == 1)"><a href="{getUrl('page',$page_no,'module_srl','')}">{$page_no}</a></li>
+		<!--@end-->
+		<li><a href="{getUrl('page',$page_navigation->last_page,'module_srl','')}">끝 페이지 &raquo;</a></li>
+	</ul>
+</div>
+
+</div>

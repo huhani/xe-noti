@@ -1,0 +1,14 @@
+<query id="setNotiRegInfoClick" action="update">
+	<tables>
+		<table name="noti_reg_id" />
+	</tables>
+	<columns>
+		<column name="is_clicked" var="is_clicked" default="Y" />
+		<column name="click_count" var="click_count" />
+		<column name="last_click" var="last_click" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="reg_srl" var="reg_srl" filter="number" />
+		<condition operation="equal" column="dev_id" var="dev_id" pipe="and" />
+	</conditions>
+</query>

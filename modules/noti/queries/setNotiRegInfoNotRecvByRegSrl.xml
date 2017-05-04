@@ -1,0 +1,13 @@
+<query id="setNotiRegInfoNotRecvByRegSrl" action="update">
+	<tables>
+		<table name="noti_reg_id" />
+	</tables>
+	<columns>
+		<column name="is_clicked" var="is_clicked" default="N" />
+		<column name="is_recv" var="is_recv" default="N" />
+		<column name="last_post" var="last_post" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="reg_srl" var="reg_srl" notnull="notnull" />
+	</conditions>
+</query>

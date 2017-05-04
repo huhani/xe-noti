@@ -1,0 +1,26 @@
+<query id="updateNotiInfo" action="update">
+	<tables>
+		<table name="noti" />
+	</tables>
+	<columns>
+		<column name="member_srl" var="t_member_srl" />
+		<column name="module_srl" var="module_srl" default="0" />
+		<column name="ipaddress" var="ipaddress" />
+		<column name="type" var="type" default="undefined" />
+		<column name="target_member_srl" var="target_member_srl" default="-1" />
+		<column name="target_nick_name" var="target_nick_name" default="undefined" />
+		<column name="target_profile_image" var="target_profile_image" default="null" />
+		<column name="content_summary" var="content_summary" default="undefined" />
+		<column name="document_srl" var="document_srl" default="0" />
+		<column name="comment_srl" var="comment_srl" default="0" />
+		<column name="target_url" var="target_url" default="/" />
+		<column name="is_readed" var="is_readed" default="N" />
+		<column name="accu_count" var="accu_count" />
+		<column name="last_update" var="last_update" />
+		<column name="regdate" var="regdate" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="noti_srl" var="noti_srl" filter="number" />
+		<condition operation="equal" column="member_srl" var="member_srl" filter="number" pipe="and" />
+	</conditions>
+</query>

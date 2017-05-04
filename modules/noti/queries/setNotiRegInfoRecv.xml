@@ -1,0 +1,13 @@
+<query id="setNotiRegInfoRecv" action="update">
+	<tables>
+		<table name="noti_reg_id" />
+	</tables>
+	<columns>
+		<column name="is_recv" var="is_recv" default="Y" />
+		<column name="recv_date" var="recv_date" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="reg_srl" var="reg_srl" filter="number" />
+		<condition operation="equal" column="dev_id" var="dev_id" pipe="and" />
+	</conditions>
+</query>

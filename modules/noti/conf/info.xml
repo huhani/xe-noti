@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module version="0.2">
+	<title xml:lang="ko">알림 모듈</title>
+	<description xml:lang="ko">HTML5 기반 클라이언트 알림 기능을 수행합니다.</description>
+	<version>0.0.0</version>
+	<date>2017-12-24</date>
+	<category>content</category>
+	<author email_address="mmia268@gmail.com" link="https://www.moringworld.com/">
+		<name xml:lang="ko">후하니</name>
+	</author>
+</module>

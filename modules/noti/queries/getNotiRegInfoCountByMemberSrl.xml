@@ -1,0 +1,11 @@
+<query id="getNotiRegInfoCountByMemberSrl" action="select">
+	<tables>
+		<table name="noti_reg_id" />
+	</tables>
+	<columns>
+		<column name="count(*)" alias="count" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="member_srl" var="member_srl" />
+	</conditions>
+</query>

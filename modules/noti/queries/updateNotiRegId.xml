@@ -1,0 +1,12 @@
+<query id="updateNotiRegId" action="update">
+	<tables>
+		<table name="noti_reg_id" />
+	</tables>
+	<columns>
+		<column name="dev_id" var="dev_id" />
+		<column name="reg_id" var="reg_id" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="reg_srl" var="reg_srl" filter="number" />
+	</conditions>
+</query>

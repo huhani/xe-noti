@@ -1,0 +1,14 @@
+<query id="setNotiInfoReaded" action="update">
+	<tables>
+		<table name="noti" />
+	</tables>
+	<columns>
+		<column name="is_readed" var="is_readed" default="N" />
+		<column name="accu_count" var="accu_count" default="0" />
+		<column name="readdate" var="readdate" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="noti_srl" var="noti_srl" filter="number" />
+		<condition operation="equal" column="member_srl" var="member_srl" filter="number" pipe="and" />
+	</conditions>
+</query>

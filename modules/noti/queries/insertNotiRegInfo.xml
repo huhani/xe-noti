@@ -1,0 +1,20 @@
+<query id="insertNotiRegInfo" action="insert">
+	<tables>
+		<table name="noti_reg_id" />
+	</tables>
+	<columns>
+		<column name="reg_srl" var="reg_srl" notnull="notnull" filter="number" />
+		<column name="noti_srl" var="noti_srl" notnull="notnull" filter="number" />
+		<column name="member_srl" var="member_srl" notnull="notnull" filter="number" />
+		<column name="ipaddress" var="ipaddress" />
+		<column name="user_agent" var="user_agent" />
+		<column name="browser" var="browser" />
+		<column name="platform" var="platform" />
+		<column name="dev_id" var="dev_id" notnull="notnull" />
+		<column name="reg_id" var="reg_id" notnull="notnull" />
+		<column name="is_recv" var="is_recv" />
+		<column name="recv_date" var="recv_date" />
+		<column name="last_post" var="last_post" />
+		<column name="regdate" var="regdate" notnull="notnull" />
+	</columns>
+</query>

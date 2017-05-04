@@ -1,0 +1,100 @@
+<!--// HEADER -->
+<include target="_header.html" />
+<h2>알림 상세정보</h2>
+<table class="x_table x_table-striped x_table-hover">
+<colgroup><col width="120">
+</colgroup>
+	<tbody>
+		<tr>
+			<th scope="col" class="nowr">닉네임</th>
+			<td>
+				<a href="#popup_menu_area" class="member_{$noti->member_srl}" onclick="return false">{$member_info->nick_name}</a>
+			</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">noti_srl</th>
+			<td>{$noti->noti_srl}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">IP Addr</th>
+			<td>
+				<a href="{getUrl('act', 'dispNotiAdminList', 'search_target', 'ipaddress', 'search_keyword', $noti->ipaddress)}">{$noti->ipaddress}</a>
+			</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">Type</th>
+			<td>{$noti->type}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">target_nick_name</th>
+			<td>
+				<!--@if($noti->target_member_srl > 0)-->
+					<a href="#popup_menu_area" class="member_{$noti->target_member_srl}" onclick="return false">{$noti->target_nick_name}</a>
+				<!--@else-->
+					{$noti->target_nick_name}
+				<!--@end-->
+			</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">Icon URL</th>
+			<td>{$noti->target_profile_image}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">document_srl</th>
+			<td>{$noti->document_srl}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">comment_srl</th>
+			<td>{$noti->comment_srl}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">target_url</th>
+			<td>{$noti->target_url}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">is_readed</th>
+			<td>{$noti->is_readed}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">accu_count</th>
+			<td>{$noti->accu_count}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">readdate</th>
+			<td>{$noti->readdate ? zdate($noti->readdate, 'Y-m-d H:i:s') : '-'}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">last_update</th>
+			<td>{zdate($noti->last_update, 'Y-m-d H:i:s')}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">regdate</th>
+			<td>{zdate($noti->regdate, 'Y-m-d H:i:s')}</td>
+		</tr>
+		<tr>
+			<th scope="col" class="nowr">device count</th>
+			<td>{$noti->device_count}</td>
+		</tr>
+
+	</tbody>
+</table>
+
+<BR>
+
+<form action="./" method="post">
+	<input type="hidden" name="error_return_url" value="/">
+	<input type="hidden" name="mid" value="">
+	<input type="hidden" name="module" value="{$module}">
+	<input type="hidden" name="act" value="procNotiAdminDelete">
+	<input type="hidden" type="number" name="member_srl" value="{$noti->member_srl}">
+
+	<div class="x_pull-left">
+		<button class="x_btn" type="button" onclick="history.go(-1)">목록</button>
+	</div>
+
+	<div class="x_pull-right">
+		<button type="submit" name="is_all" class="x_btn" value="false">삭제</button>
+	</div>
+</form>
+
+<include target="_footer.html" />

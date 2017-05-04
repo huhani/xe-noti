@@ -1,0 +1,25 @@
+<query id="updateNotiRegInfo" action="update">
+	<tables>
+		<table name="noti_reg_id" />
+	</tables>
+	<columns>
+		<column name="reg_srl" var="reg_srl" />
+		<column name="noti_srl" var="noti_srl" />
+		<column name="ipaddress" var="ipaddress" />
+		<column name="user_agent" var="user_agent" />
+		<column name="browser" var="browser" />
+		<column name="platform" var="platform" />
+		<column name="dev_id" var="dev_id" />
+		<column name="reg_id" var="reg_id" />
+		<column name="click_count" var="click_count" />
+		<column name="is_clicked" var="is_clicked" />
+		<column name="is_recv" var="is_recv" />
+		<column name="last_click" var="last_click" />
+		<column name="recv_date" var="recv_date" />
+		<column name="regdate" var="regdate" />
+	</columns>
+	<conditions>
+		<condition operation="equal" column="reg_srl" var="reg_srl" filter="number" />
+		<condition operation="equal" column="member_srl" var="member_srl" filter="number" pipe="and" />
+	</conditions>
+</query>

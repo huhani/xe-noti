@@ -1,0 +1,17 @@
+<div class="x_page-header">
+	<h1>
+		{$lang->noti}
+	</h1>
+</div>
+
+<ul class="x_nav x_nav-tabs">
+	<li class="x_active"|cond="$act == 'dispNotiAdminList' || $act == 'dispNotiAdminView'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminList')}">알림 목록</a>
+	</li>
+	<li class="x_active"|cond="$act == 'dispNotiAdminRegInfoList' || $act == 'dispNotiAdminRegInfoView'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminRegInfoList')}">단말기 목록</a>
+	</li>
+	<li class="x_active"|cond="$act == 'dispNotiAdminConfig'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminConfig')}">모듈</a>
+	</li>
+</ul>

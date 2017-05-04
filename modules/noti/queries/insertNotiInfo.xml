@@ -1,0 +1,18 @@
+<query id="insertNotiInfo" action="insert">
+	<tables>
+		<table name="noti" />
+	</tables>
+	<columns>
+		<column name="noti_srl" var="noti_srl" notnull="notnull" filter="number" />
+		<column name="member_srl" var="member_srl" notnull="notnull" filter="number" />
+		<column name="target_member_srl" var="member_srl" notnull="notnull" filter="number" default="0" />
+		<column name="target_nick_name" var="target_nick_name" />
+		<column name="target_profile_image" var="target_profile_image" />
+		<column name="target_url" var="target_url" />
+		<column name="content_summary" var="content_summary" />
+		<column name="ipaddress" var="ipaddress" />
+		<column name="type" var="type" />
+		<column name="last_update" var="last_update" />
+		<column name="regdate" var="regdate" notnull="notnull" filter="number" />
+	</columns>
+</query>
