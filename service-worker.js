@@ -1,7 +1,7 @@
 'use strict';
 
 // ServiceWorker에선 localStorage, Cookies를 사용할 수 없다.
-// 당연히 DOM(window, document) 접근이 불가능하다. 하지만 indexedDB는 사용 가능하다.
+// 당연히 DOM(window, document)에도 접근이 불가능하다. 하지만 indexedDB는 사용 가능하다.
 var DB = null;
 
 function openDB() {
