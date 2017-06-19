@@ -337,7 +337,6 @@ window.notiFunc = {
 				// Endpoint값이 유효한지 검사.
 				// 로그아웃을 하여도, 쿠키를 날려먹어도 indexedDB에 남아있는 데이터를 이용하여 유효성 체크.
 				// 유효하지 않을시 그냥 알림 설정 리셋.
-				// global.notiFunc 보기 좆같다. 나중에 시간나면 프로토타입 쓰자.
 				global.notiFunc.checkUseNotiDevice(endpoint, reg_srl, true).then(function(dev_id) {
 					if(dev_id) {
 						var _noti = reg_srl + '.' + dev_id;
