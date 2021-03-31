@@ -1,9 +1,0 @@
-{
-  "gcm_sender_id": "숫자형식의 FCM(GCM) ID",
-  "name": "사이트 이름",
-  "short_name": "site name",
-  "start_url": "/index.php",
-  "display": "standalone",
-  "theme_color": "#2e3aa1",
-  "background_color": "#ffffff"
-}
