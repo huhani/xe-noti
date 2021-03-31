@@ -1,0 +1,16 @@
+<query id="getPushLogByDateRange" action="select">
+    <tables>
+        <table name="noti_push" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="endpoint_srl" var="endpoint_srl" notnull="notnull" />
+        <condition operation="more" column="regdate" var="startDate" pipe="and" />
+        <condition operation="less" column="regdate" var="endDate" pipe="and" />
+    </conditions>
+    <navigation>
+        <index var="sortIndex" default="regdate" order="orderType" />
+    </navigation>
+</query>

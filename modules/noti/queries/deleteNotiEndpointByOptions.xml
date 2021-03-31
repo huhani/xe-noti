@@ -1,0 +1,12 @@
+<query id="deleteNotiEndpointByOptions" action="delete">
+    <tables>
+        <table name="noti_endpoint" />
+    </tables>
+    <conditions>
+        <condition operation="equal" column="member_srl" var="s_member_srl" pipe="or" />
+        <condition operation="like" column="nick_name" var="s_nick_name" pipe="or" />
+        <condition operation="like_prefix" column="read_ipaddress" var="s_ipaddress" pipe="or" />
+        <condition operation="like_prefix" column="click_ipaddress" var="s_ipaddress" pipe="or" />
+        <condition operation="like_prefix" column="regdate" var="s_regdate" pipe="or" />
+    </conditions>
+</query>

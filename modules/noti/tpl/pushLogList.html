@@ -1,0 +1,270 @@
+<include target="_header.html" />
+
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == ''" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+    <p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+
+<form id="fo_list" action="./" method="get">
+    <input type="hidden" name="module" value="{$module}" />
+    <input type="hidden" name="page" value="{$page}" />
+    <table id="notiListTable" class="x_table x_table-striped x_table-hover noti reg_list">
+
+        <caption>
+            <a href="{getUrl('filter_type', '', 'page', '')}" class="active"|cond="!$filter_type">전체<block cond="!$filter_type">({$total_count})</block></a>
+            <i>|</i>
+            <a href="{getUrl('filter_type', 'not_readed', 'page', '')}" class="active"|cond="$filter_type=='not_readed'">미수신<block cond="$filter_type=='not_readed'">({$total_count})</block></a>
+            <i>|</i>
+            <a href="{getUrl('filter_type', 'readed', 'page', '')}" class="active"|cond="$filter_type=='readed'">수신<block cond="$filter_type=='readed'">({$total_count})</block></a>
+            <i>|</i>
+            <a href="{getUrl('filter_type', 'clicked', 'page', '')}" class="active"|cond="$filter_type=='clicked'">클릭<block cond="$filter_type=='clicked'">({$total_count})</block></a>
+            <i>|</i>
+            <a href="{getUrl('filter_type', 'send_failure', 'page', '')}" class="active"|cond="$filter_type=='send_failure'">전송실패<block cond="$filter_type=='send_failure'">({$total_count})</block></a>
+
+
+            <div class="x_pull-right x_btn-group">
+                <a data-value="delete" class="modalAnchor x_btn xe-modal-window x_disabled">삭제</a>
+            </div>
+        </caption>
+
+        <thead>
+
+        <tr>
+            <th>번호</th>
+            <th>단말기 ID</th>
+            <th>수신자</th>
+            <th>발신자</th>
+            <th>알림종류</th>
+            <th>알림내용</th>
+            <th>전송유무</th>
+            <th>수신시각</th>
+            <th>알림 클릭시각</th>
+            <th>발송시각</th>
+            <th>설정</th>
+            <th scope="col">
+                <input type="checkbox" title="Check All" class="pushLog-checkall" data-name="push_srls" />
+            </th>
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr loop="$list => $no, $list">
+
+            <td>
+                {$no}
+            </td>
+
+            <td>
+                <a href="{getUrl('search_target', 'endpoint_srl', 'search_keyword', $list->endpoint_srl, 'page', '')}" >{$list->endpoint_srl}</a>
+            </td>
+
+            <td>
+                <a href="#popup_menu_area" class="member_{$list->member_srl}" onclick="return false"></a>
+                <a href="{getUrl('search_target', 'member_srl', 'search_keyword', $list->member_srl, 'page', '')}" >
+                    {cut_str($list->nick_name, 10)}
+                </a>
+            </td>
+
+            <td>
+                <a href="#popup_menu_area" class="member_{$list->sender_member_srl}" onclick="return false"></a>
+                <a href="{getUrl('search_target', 'sender_member_srl', 'search_keyword', $list->sender_member_srl, 'page', '')}"  >
+                    {cut_str($list->sender_nick_name, 10)}
+                </a>
+            </td>
+
+            <td>
+                <a href="{getUrl('search_target', 'type', 'search_keyword', $list->type, 'page', '')}">
+                    <!--@if($list->type === "comment")-->
+                    댓글
+                    <!--@else if($list->type === "comment_comment")-->
+                    대댓글
+                    <!--@else if($list->type === "mention")-->
+                    멘션
+                    <!--@else if($list->type === "scrap")-->
+                    스크랩
+                    <!--@else if($list->type === "vote")-->
+                    추천
+                    <!--@else if($list->type === "message")-->
+                    쪽지
+                    <!--@else if($list->type === "admin_content")-->
+                    관리자 알림
+                    <!--@else if($list->type === "subscribe_notification")-->
+                    구독 알림
+                    <!--@else if($list->type === "custom")-->
+                    기타
+                    <!--@else if($list->type === "manual")-->
+                    수동
+                    <!--@end-->
+                </a>
+            </td>
+
+            <td>
+                <!--@if($list->target_url)-->
+                <a href="{$list->target_url}" target="_blank">{cut_str($list->content_summary, 60)}</a>
+                <!--@else-->
+                {cut_str($list->content_summary, 60)}
+                <!--@end-->
+            </td>
+
+            <td>
+                <!--@if($list->status_code === 201)-->
+                <span style="color:blue;">성공</span>
+                <!--@else-->
+                <span style="color:red;">실패 ({$list->status_code})</span>
+                <!--@end-->
+            </td>
+
+            <td>
+                <!--@if($list->is_readed === "Y" && $list->read_date !== null)-->
+                {zdate($list->read_date,"Y.m.d H:i")}
+                <!--@else if($list->is_readed === "Y")-->
+                읽음
+                <!--@else-->
+                -
+                <!--@end-->
+            </td>
+
+            <td>
+                <!--@if($list->is_clicked === "Y" && $list->click_date !== null)-->
+                {zdate($list->click_date,"Y.m.d H:i")}
+                <!--@else if($list->is_clicked === "Y")-->
+                클릭
+                <!--@else-->
+                -
+                <!--@end-->
+            </td>
+
+
+            <td>
+                {zdate($list->regdate,"Y.m.d H:i")}
+            </td>
+
+            <td>
+                <a href="{getUrl('act', 'dispNotiAdminPushLogView', 'push_srl', $list->push_srl)}" class="modalAnchor xe-modal-window" >자세히</a>
+            </td>
+
+            <td><input type="checkbox" name="push_srls[]" value="{$list->push_srl}"/></td>
+        </tr>
+
+        </tbody>
+    </table>
+
+    <div class="x_pull-right x_btn-group">
+        <a data-value="delete" class="modalAnchor x_btn xe-modal-window x_disabled">삭제</a>
+    </div>
+
+</form>
+
+<form action="./" class="x_pagination x_pull-left" style="margin:0px 0 0 0">
+    <input type="hidden" name="error_return_url" value="" />
+    <input type="hidden" name="module" value="{$module}" />
+    <input type="hidden" name="act" value="{$act}" />
+    <input cond="$search_keyword" type="hidden" name="search_keyword" value="{$search_keyword}" />
+    <input cond="$search_target" type="hidden" name="search_target" value="{$search_target}" />
+    <ul>
+        <li class="x_disabled"|cond="!$page || $page == 1"><a href="{getUrl('page', '')}">&laquo; {$lang->first_page}</a></li>
+        <block cond="$page_navigation->first_page != 1 && $page_navigation->first_page + $page_navigation->page_count > $page_navigation->last_page - 1 && $page_navigation->page_count != $page_navigation->total_page">
+            {@$isGoTo = true}
+            <li>
+                <a href="#goTo" data-toggle title="{$lang->cmd_go_to_page}">&hellip;</a>
+                <span cond="$isGoTo" id="goTo" class="x_input-append">
+				<input type="number" min="1" max="{$page_navigation->last_page}" required name="page" title="{$lang->cmd_go_to_page}" />
+				<button type="submit" class="x_add-on">Go</button>
+			</span>
+            </li>
+        </block>
+
+        <!--@while($page_no = $page_navigation->getNextPage())-->
+        {@$last_page = $page_no;
+        if(!$page) $page = 1;
+        }
+        <li class="x_active"|cond="$page_no == $page"><a href="{getUrl('page', $page_no)}">{$page_no}</a></li>
+        <!--@end-->
+
+        <block cond="$last_page != $page_navigation->last_page && $last_page + 1 != $page_navigation->last_page">
+            {@$isGoTo = true}
+            <li>
+                <a href="#goTo" data-toggle title="{$lang->cmd_go_to_page}">&hellip;</a>
+                <span cond="$isGoTo" id="goTo" class="x_input-append">
+				<input type="number" min="1" max="{$page_navigation->last_page}" required name="page" title="{$lang->cmd_go_to_page}" />
+				<button type="submit" class="x_add-on">Go</button>
+			</span>
+            </li>
+        </block>
+        <li class="x_disabled"|cond="$page == $page_navigation->last_page"><a href="{getUrl('page', $page_navigation->last_page)}" title="{$page_navigation->last_page}">{$lang->last_page} &raquo;</a></li>
+    </ul>
+</form>
+
+<BR>
+<form action="./" method="get" style="margin:20px 0 0 0;" class="search center x_input-append x_clearfix">
+    <input type="hidden" name="module" value="{$module}" />
+    <input type="hidden" name="act" value="{$act}" />
+    <input type="hidden" name="error_return_url" value="" />
+    <select name="search_target" title="{$lang->search_target}" style="margin-right:4px">
+        <option value="nick_name" selected="selected"|cond="$search_target == 'nick_name'">수신자 닉네임 (등록당시)</option>
+        <option value="nick_name_now" selected="selected"|cond="$search_target == 'nick_name_now'">수신자 닉네임 (현재)</option>
+        <option value="member_srl" selected="selected"|cond="$search_target == 'member_srl'">수신자 회원번호</option>
+        <option value="sender_nick_name" selected="selected"|cond="$search_target == 'sender_nick_name'">발신자 닉네임 (등록당시)</option>
+        <option value="sender_nick_name_now" selected="selected"|cond="$search_target == 'sender_nick_name_now'">발신자 닉네임 (현재)</option>
+        <option value="sender_member_srl" selected="selected"|cond="$search_target == 'sender_member_srl'">발신자 회원번호</option>
+        <option value="endpoint_srl" selected="selected"|cond="$search_target == 'endpoint_srl'">단말기 ID</option>
+        <option value="document_srl" selected="selected"|cond="$search_target == 'document_srl'">문서번호</option>
+        <option value="target_srl" selected="selected"|cond="$search_target == 'target_srl'">대상번호</option>
+        <option value="type" selected="selected"|cond="$search_target == 'type'">종류</option>
+        <option value="content_summary" selected="selected"|cond="$search_target == 'content_summary'">알림내용</option>
+        <option value="push_payload" selected="selected"|cond="$search_target == 'push_payload'">Payload</option>
+        <option value="status_code" selected="selected"|cond="$search_target == 'status_code'">StatusCode</option>
+        <option value="target_url" selected="selected"|cond="$search_target == 'target_url'">URL</option>
+        <option value="ipaddress" selected="selected"|cond="$search_target == 'ipaddress'">IP주소</option>
+        <option value="regdate" selected="selected"|cond="$search_target == 'regdate'">등록일</option>
+    </select>
+    <input type="search" name="search_keyword" value="{htmlspecialchars($search_keyword, ENT_COMPAT | ENT_HTML401, 'UTF-8', false)}" title="{$lang->cmd_search}" />
+    <button type="submit" class="x_btn x_btn-inverse">{$lang->cmd_search}</button>
+    <a href="{getUrl('','module',$module,'act',$act)}" class="x_btn">{$lang->cmd_cancel}</a>
+</form>
+
+<script>
+
+    (function($){
+        function disableDeleteBtnIfItemNotExtst() {
+            var $btn = $('form a[data-value=delete]');
+            if($('form input[name^=push_srls]:checked').length > 0) {
+                $btn.removeClass('x_disabled');
+            } else {
+                if(!$btn.hasClass('x_disabled')) {
+                    $btn.addClass('x_disabled');
+                }
+            }
+        }
+
+        $(document).on('change', 'form input[name^=push_srls]', function(evt) {
+            disableDeleteBtnIfItemNotExtst();
+        });
+
+        $(document).on('click', 'form .pushLog-checkall', function() {
+            $('input[type=checkbox][name^=push_srls]').prop('checked', $(this).prop('checked'));
+            disableDeleteBtnIfItemNotExtst();
+        });
+
+        $(document).on('click', 'form a[data-value=delete]', function() {
+            var push_srls = [];
+            $('input[type=checkbox][name^=push_srls]:checked').each(function(idx, each){
+                if(each.value) {
+                    push_srls.push(each.value);
+                }
+            });
+
+            window.exec_json('noti.procNotiAdminPushLogDelete', {
+                push_srls: push_srls
+            }, function(resp){
+                alert('삭제되었습니다.');
+                window.location.reload();
+            });
+
+        });
+    })(window.jQuery);
+
+
+</script>

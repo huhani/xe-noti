@@ -1,0 +1,9 @@
+<query id="deleteNotiEndpoint" action="delete">
+    <tables>
+        <table name="noti_endpoint" />
+    </tables>
+    <conditions>
+        <condition operation="equal" column="endpoint_crc32" var="endpoint_crc32" filter="number" notnull="notnull" />
+        <condition operation="equal" column="endpoint" var="endpoint" notnull="notnull" pipe="and" />
+    </conditions>
+</query>

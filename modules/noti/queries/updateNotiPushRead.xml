@@ -1,0 +1,14 @@
+<query id="updateNotiPushRead" action="update">
+    <tables>
+        <table name="noti_push" />
+    </tables>
+    <columns>
+        <column name="is_readed" var="is_readed" />
+        <column name="read_date" var="read_date" />
+        <column name="read_ipaddress" var="read_ipaddress" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="push_srl" var="push_srl" filter="number" notnull="notnull" />
+        <condition operation="equal" column="is_readed" var="target_read_state" notnull="notnull" pipe="and" />
+    </conditions>
+</query>

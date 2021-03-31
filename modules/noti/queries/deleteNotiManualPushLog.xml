@@ -1,0 +1,8 @@
+<query id="deleteNotiManualPushLog" action="delete">
+    <tables>
+        <table name="noti_manual_push" />
+    </tables>
+    <conditions>
+        <condition operation="in" column="manual_push_srl" var="manual_push_srls" notnull="notnull" />
+    </conditions>
+</query>

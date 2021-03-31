@@ -1,0 +1,14 @@
+<query id="updateNotiPushClick" action="update">
+    <tables>
+        <table name="noti_push" />
+    </tables>
+    <columns>
+        <column name="is_clicked" var="is_clicked" />
+        <column name="click_date" var="click_date" />
+        <column name="click_ipaddress" var="click_ipaddress" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="push_srl" var="push_srl" filter="number" notnull="notnull" />
+        <condition operation="equal" column="is_clicked" var="target_click_state" notnull="notnull" pipe="and" />
+    </conditions>
+</query>

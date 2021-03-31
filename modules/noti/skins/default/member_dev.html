@@ -1,0 +1,23 @@
+{@
+	Context::addHtmlHeader('<link rel="manifest" href="/manifest.json">');
+}
+
+
+<div id="noti_mypage" class="noti_bd">
+
+	<a href="javascript:NotiClientContainer.getInstance().subscribe()">구독</a>
+
+	<BR>
+	<BR>
+	<BR>
+	<BR>
+	<BR>
+
+	<a href="javascript:NotiClientContainer.getInstance().unsubscribe()">구독해지</a>
+	<BR>
+	<BR>
+	<BR>
+	<BR>
+
+	<a href="javascript:NotiClientContainer.getInstance().removeServiceWorker()">알림강제삭제</a>
+</div>

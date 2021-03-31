@@ -1,0 +1,178 @@
+<include target="_header.html" />
+
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == ''" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+    <p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+
+<form id="fo_list" action="./" method="get">
+    <input type="hidden" name="module" value="{$module}" />
+    <input type="hidden" name="page" value="{$page}" />
+    <table id="notiListTable" class="x_table x_table-striped x_table-hover noti reg_list">
+
+        <caption>
+            <div class="x_pull-right x_btn-group">
+                <a href="{getUrl('act', 'dispNotiAdminManualPushInsert')}" class="modalAnchor x_btn xe-modal-window x_btn-inverse">전송</a>
+                <a data-value="delete" class="modalAnchor x_btn xe-modal-window x_disabled">삭제</a>
+            </div>
+        </caption>
+
+        <thead>
+
+        <tr>
+            <th>번호</th>
+            <th>발송인</th>
+            <th>제목</th>
+            <th>등록일</th>
+            <th>기타</th>
+            <th scope="col">
+                <input type="checkbox" title="Check All" class="manualPush-checkall" data-name="manual_push_srls" />
+            </th>
+        </tr>
+
+        </thead>
+
+        <tbody>
+
+        <tr loop="$list => $no, $list">
+
+            <td>
+                {$no}
+            </td>
+
+            <td>
+                <a href="#popup_menu_area" class="member_{$list->member_srl}" onclick="return false"></a>
+                <a href="{getUrl('search_target', 'member_srl', 'search_keyword', $list->member_srl, 'page', '')}">
+                    {cut_str($list->nick_name, 10)}
+                </a>
+            </td>
+
+
+
+            <td>
+                <a href="{getUrl('act', 'dispNotiAdminManualPushView', 'manual_push_srl', $list->manual_push_srl)}" target="_blank">
+                    {cut_str($list->title, 60)}
+                </a>
+            </td>
+
+
+            <td>
+                {zdate($list->regdate,"Y.m.d H:i")}
+            </td>
+
+            <td>
+                <a href="{getUrl('act', 'dispNotiAdminManualPushInsert', 'manual_push_srl', $list->manual_push_srl)}" class="modalAnchor xe-modal-window" >재발송</a>
+            </td>
+
+            <td><input type="checkbox" name="manual_push_srls[]" value="{$list->manual_push_srl}"/></td>
+
+        </tr>
+
+        </tbody>
+    </table>
+
+    <div class="x_pull-right x_btn-group">
+        <a href="{getUrl('act', 'dispNotiAdminManualPushInsert')}" class="modalAnchor x_btn xe-modal-window x_btn-inverse">전송</a>
+        <a data-value="delete" class="modalAnchor x_btn xe-modal-window x_disabled">삭제</a>
+
+    </div>
+
+</form>
+
+<form action="./" class="x_pagination x_pull-left" style="margin:0px 0 0 0">
+    <input type="hidden" name="error_return_url" value="" />
+    <input type="hidden" name="module" value="{$module}" />
+    <input type="hidden" name="act" value="{$act}" />
+    <input cond="$search_keyword" type="hidden" name="search_keyword" value="{$search_keyword}" />
+    <input cond="$search_target" type="hidden" name="search_target" value="{$search_target}" />
+    <ul>
+        <li class="x_disabled"|cond="!$page || $page == 1"><a href="{getUrl('page', '')}">&laquo; {$lang->first_page}</a></li>
+        <block cond="$page_navigation->first_page != 1 && $page_navigation->first_page + $page_navigation->page_count > $page_navigation->last_page - 1 && $page_navigation->page_count != $page_navigation->total_page">
+            {@$isGoTo = true}
+            <li>
+                <a href="#goTo" data-toggle title="{$lang->cmd_go_to_page}">&hellip;</a>
+                <span cond="$isGoTo" id="goTo" class="x_input-append">
+				<input type="number" min="1" max="{$page_navigation->last_page}" required name="page" title="{$lang->cmd_go_to_page}" />
+				<button type="submit" class="x_add-on">Go</button>
+			</span>
+            </li>
+        </block>
+
+        <!--@while($page_no = $page_navigation->getNextPage())-->
+        {@$last_page = $page_no;
+        if(!$page) $page = 1;
+        }
+        <li class="x_active"|cond="$page_no == $page"><a href="{getUrl('page', $page_no)}">{$page_no}</a></li>
+        <!--@end-->
+
+        <block cond="$last_page != $page_navigation->last_page && $last_page + 1 != $page_navigation->last_page">
+            {@$isGoTo = true}
+            <li>
+                <a href="#goTo" data-toggle title="{$lang->cmd_go_to_page}">&hellip;</a>
+                <span cond="$isGoTo" id="goTo" class="x_input-append">
+				<input type="number" min="1" max="{$page_navigation->last_page}" required name="page" title="{$lang->cmd_go_to_page}" />
+				<button type="submit" class="x_add-on">Go</button>
+			</span>
+            </li>
+        </block>
+        <li class="x_disabled"|cond="$page == $page_navigation->last_page"><a href="{getUrl('page', $page_navigation->last_page)}" title="{$page_navigation->last_page}">{$lang->last_page} &raquo;</a></li>
+    </ul>
+</form>
+
+<BR>
+<form action="./" method="get" style="margin:20px 0 0 0;" class="search center x_input-append x_clearfix">
+    <input type="hidden" name="module" value="{$module}" />
+    <input type="hidden" name="act" value="{$act}" />
+    <input type="hidden" name="error_return_url" value="" />
+    <select name="search_target" title="{$lang->search_target}" style="margin-right:4px">
+        <option value="nick_name" selected="selected"|cond="$search_target == 'nick_name'">발신자 닉네임 (등록당시)</option>
+        <option value="nick_name_now" selected="selected"|cond="$search_target == 'nick_name_now'">발신자 닉네임 (현재)</option>
+        <option value="member_srl" selected="selected"|cond="$search_target == 'member_srl'">발신자 회원번호</option>
+        <option value="title" selected="selected"|cond="$search_target == 'title'">제목</option>
+        <option value="content" selected="selected"|cond="$search_target == 'content'">내용</option>
+        <option value="target_url" selected="selected"|cond="$search_target == 'target_url'">URL</option>
+        <option value="image" selected="selected"|cond="$search_target == 'image'">이미지 URL</option>
+        <option value="icon" selected="selected"|cond="$search_target == 'icon'">아이콘 URL</option>
+
+        <option value="regdate" selected="selected"|cond="$search_target == 'regdate'">등록일</option>
+    </select>
+    <input type="search" name="search_keyword" value="{htmlspecialchars($search_keyword, ENT_COMPAT | ENT_HTML401, 'UTF-8', false)}" title="{$lang->cmd_search}" />
+    <button type="submit" class="x_btn x_btn-inverse">{$lang->cmd_search}</button>
+    <a href="{getUrl('','module',$module,'act',$act)}" class="x_btn">{$lang->cmd_cancel}</a>
+</form>
+
+<script>
+    (function($){
+        function disableDeleteBtnIfItemNotExtst() {
+            var $btn = $('form a[data-value=delete]');
+            if($('form input[name^=manual_push_srls]:checked').length > 0) {
+                $btn.removeClass('x_disabled');
+            } else {
+                if(!$btn.hasClass('x_disabled')) {
+                    $btn.addClass('x_disabled');
+                }
+            }
+        }
+        $(document).on('change', 'form input[name^=manual_push_srls]', function(evt) {
+            disableDeleteBtnIfItemNotExtst();
+        });
+        $(document).on('click', 'form .manualPush-checkall', function() {
+            $('input[type=checkbox][name^=manual_push_srls]').prop('checked', $(this).prop('checked'));
+            disableDeleteBtnIfItemNotExtst();
+        });
+        $(document).on('click', 'form a[data-value=delete]', function() {
+            var manual_push_srls = [];
+            $('input[type=checkbox][name^=manual_push_srls]:checked').each(function(idx, each){
+                if(each.value) {
+                    manual_push_srls.push(each.value);
+                }
+            });
+            window.exec_json('noti.procNotiAdminManualPushDelete', {
+                manual_push_srls: manual_push_srls
+            }, function(resp){
+                alert('삭제되었습니다.');
+                window.location.reload();
+            });
+        });
+    })(window.jQuery);
+</script>

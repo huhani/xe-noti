@@ -1,0 +1,15 @@
+<query id="updateNotiEndpointDevice" action="update">
+    <tables>
+        <table name="noti_endpoint" />
+    </tables>
+    <columns>
+        <column name="endpoint" var="endpoint" notnull="notnull" />
+        <column name="endpoint_crc32" var="endpoint_crc32" notnull="notnull" />
+        <column name="key" var="key" />
+        <column name="auth" var="auth" />
+        <column name="last_update" var="last_update" notnull="notnull" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="endpoint_srl" var="endpoint_srl" filter="number" notnull="notnull" />
+    </conditions>
+</query>

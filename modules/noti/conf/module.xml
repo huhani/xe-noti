@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<module>
+	<grants />
+	<permissions />
+	<actions>
+
+		<action name="dispNotiDeviceList" type="view" />
+
+		<action name="getNotiServerKey" type="model" />
+		<action name="getNotiAdminPushLog" type="model" />
+		<action name="getNotiAdminPushLogCount" type="model" />
+		<action name="getNotiAdminEndpointCount" type="model" />
+		<action name="getNotiAdminDormantEndpointCount" type="model" />
+		<action name="getNotiAdminMemberList" type="model" />
+		<action name="getNotiNotificationByServiceWorker" type="model" />
+		<action name="getNotiCheckUseDevice" type="model" />
+		<action name="getNotiPushDefaultMessage" type="model" />
+
+		<action name="procNotiDeviceInsert" type="controller" />
+		<action name="procNotiDeviceDelete" type="controller" />
+		<action name="procNotiServiceWorkerEvent" type="controller" />
+		<action name="procNotiPushSubscriptionChange" type="controller" />
+
+
+
+		<action name="dispNotiAdminModuleConfig" type="view" admin_index="true"  />
+		<action name="dispNotiAdminNcenterliteConfig" type="view" />
+		<action name="dispNotiAdminPushGroupList" type="view" />
+		<action name="dispNotiAdminPushGroupInsert" type="view" />
+		<action name="dispNotiAdminEndpointList" type="view" />
+		<action name="dispNotiAdminEndpointView" type="view" />
+		<action name="dispNotiAdminPushLogList" type="view" />
+		<action name="dispNotiAdminPushLogView" type="view" />
+		<action name="dispNotiAdminInspectView" type="view" />
+		<action name="dispNotiAdminManualPushList" type="view" />
+		<action name="dispNotiAdminManualPushView" type="view" />
+		<action name="dispNotiAdminManualPushInsert" type="view" />
+
+		<action name="procNotiAdminModuleConfig" type="controller" />
+		<action name="procNotiAdminNcenterliteConfig" type="controller" />
+		<action name="procNotiAdminPushGroupInsert" type="controller" />
+		<action name="procNotiAdminPushGroupDelete" type="controller" />
+		<action name="procNotiAdminEndpointDelete" type="controller" />
+		<action name="procNotiAdminPushLogDelete" type="controller" />
+		<action name="procNotiAdminMessageQueueServerTest" type="controller" />
+		<action name="procNotiAdminMessageQueuePurge" type="controller" />
+		<action name="procNotiAdminNodeExitRequest" type="controller" />
+		<action name="procNotiAdminPushResend" type="controller" />
+		<action name="procNotiAdminPushLogDeleteByOptions" type="controller" />
+		<action name="procNotiAdminManualPushInsert" type="controller" />
+		<action name="procNotiAdminManualPushDelete" type="controller" />
+	</actions>
+	<menus>
+		<menu name="noti" type="all">
+			<title xml:lang="ko">알림</title>
+		</menu>
+	</menus>
+</module>

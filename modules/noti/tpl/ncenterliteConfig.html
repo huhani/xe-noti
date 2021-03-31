@@ -1,0 +1,380 @@
+<include target="_header.html" />
+
+<!--TODO-->
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == ''" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+    <p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+<form action="/" method="post" class="x_form-horizontal">
+    <input type="hidden" name="module" value="noti">
+    <input type="hidden" name="act" value="procNotiAdminNcenterliteConfig">
+    <input type="hidden" name="success_return_url" value="{getUrl('', 'module', 'admin', 'act', 'dispNotiAdminNcenterliteConfig')}">
+
+
+    <section class="section">
+        <h1>전체<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+        <div class="x_control-group">
+            <label class="x_control-label">알림센터 연동</label>
+            <div class="x_controls">
+                <label class="x_inline" for="ncenterlite_use">
+                    <input type="radio" id="ncenterlite_use" name="ncenterlite[use]" value="Y" checked="checked"|cond="$ncenterliteConfig['use']">{$lang->use}</label>
+
+                <label class="x_inline" for="ncenterlite_not_use">
+                    <input type="radio" id="ncenterlite_not_use" name="ncenterlite[use]" value="N" checked="checked"|cond="!$ncenterliteConfig['use']">{$lang->not_use}</label>
+                <a href="#this_module_help" class="x_icon-question-sign" data-toggle="#this_module_help">{$lang->help}</a>
+                <p id="this_module_help" class="x_help-block" hidden="hidden">알림센터 모듈알림을 연동합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group" for="ncenterlite_defaultProfileIamge">
+            <label class="x_control-label">@profile_image 기본값</label>
+            <div class="x_controls">
+                <input type="text" value="{$ncenterliteConfig['defaultProfileImage']}" name="ncenterlite[defaultProfileImage]" id="ncenterlite_defaultProfileIamge" style="width:350px;">
+
+                <a href="#ncenterlite_defaultProfileIamge_help" class="x_icon-question-sign" data-toggle="#ncenterlite_defaultProfileIamge_help">{$lang->help}</a>
+                <p id="ncenterlite_defaultProfileIamge_help" class="x_help-block" hidden="hidden">@profile_image에 대한 기본값을 입력합니다. 알림센터 알림의 사용자 프로필 사진이 없을때 대체할 이미지로 사용됩니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group" for="ncenterlite_defaultIamge">
+            <label class="x_control-label">@image 기본값</label>
+            <div class="x_controls">
+                <input type="text" value="{$ncenterliteConfig['defaultImage']}" name="ncenterlite[defaultImage]" id="ncenterlite_defaultIamge" style="width:350px;">
+
+                <a href="#ncenterlite_defaultIamge_help" class="x_icon-question-sign" data-toggle="#ncenterlite_defaultIamge_help">{$lang->help}</a>
+                <p id="ncenterlite_defaultIamge_help" class="x_help-block" hidden="hidden">@image에 대한 기본값을 입력합니다. 섬네일이 없는 알림일 경우 이 설정값을 참조하여 이미지를 출력합니다.</p>
+            </div>
+        </div>
+        <div class="x_control-group" for="ncenterlite_defaultImageType">
+            <label class="x_control-label">@image 대상 이미지</label>
+            <div class="x_controls">
+                <input type="text" value="{implode(';', $ncenterliteConfig['defaultImageType'])}" name="ncenterlite[defaultImageType]" id="ncenterlite_defaultImageType" style="width:350px;">
+
+                <a href="#ncenterlite_defaultImageType_help" class="x_icon-question-sign" data-toggle="#ncenterlite_defaultImageType_help">{$lang->help}</a>
+                <p id="ncenterlite_defaultImageType_help" class="x_help-block" hidden="hidden">
+                    게시글 멘션 및 댓글알림에 사용될 이미지의 파일 타입을 입력합니다.<BR>
+                    게시글, 댓글에 첨부된 이미지의 파일명을 기준으로 이미지를 선별합니다.<BR>
+                    규칙은 '파일명.확장자'로 구분되며, ';'를 이용하여 규칙을 구분합니다.<BR>
+                    파일명/확장자에 '*'을 사용할 경우 파일명 혹은 확장자 구분을 건너뜁니다.<BR>
+                    (예: *.png라고 입력하였을 경우 파일명과는 상관없이 제일 처음에 첨부된 png파일을 이미지로 사용함)
+                </p>
+            </div>
+        </div>
+
+    </section>
+
+
+    <block loop="$ncenterliteConfig['types'] => $key,$val">
+
+        <section class="section">
+            <h1>{$val['name']}<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_use" class="x_control-label">알림 사용</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_use">
+                        <input type="radio" id="ncenterlite_{$key}_use" name="ncenterlite[types][{$key}][use]" value="Y" checked="checked"|cond="$val['use']">{$lang->use}</label>
+
+                    <label class="x_inline" for="ncenterlite_{$key}_not_use">
+                        <input type="radio" id="ncenterlite_{$key}_not_use" name="ncenterlite[types][{$key}][use]" value="N" checked="checked"|cond="!$val['use']">{$lang->not_use}</label>
+                    <a href="#ncenterlite_{$key}_use_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_use_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_use_help" class="x_help-block" hidden="hidden">알림센터의 {$val['name']} 알림 트리거를 수신후 웹 푸시를 발송합니다.</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_title" class="x_control-label">알림 제목</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_title">
+                        <input type="text" value="{$val['title']}" name="ncenterlite[types][{$key}][title]}" id="ncenterlite_{$key}_title" style="width:450px;"></label>
+                    <a href="#ncenterlite_{$key}_title_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_title_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_title_help" class="x_help-block" hidden="hidden">푸시 알림에 사용될 메세지의 제목을 입력합니다.</p>
+                </div>
+            </div>
+
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_body" class="x_control-label">알림 내용</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_body">
+                        <textarea name="ncenterlite[types][{$key}][body]" id="ncenterlite_{$key}_body" rows="3" style="width:450px;">{$val['body']}</textarea>
+                    </label>
+                    <a href="#ncenterlite_{$key}_body_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_body_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_body_help" class="x_help-block" hidden="hidden">알림에 표시할 내용을 입력합니다. 기본값 : #[@nick_name] [@content_summary]</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_launchUrl" class="x_control-label">이동 URL</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_launchUrl">
+                        <input type="text" value="{$val['launchUrl']}" name="ncenterlite[types][{$key}][launchUrl]" id="ncenterlite_{$key}_launchUrl" style="width:450px;"></label>
+                    <a href="#ncenterlite_{$key}_launchUrl_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_launchUrl_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_launchUrl_help" class="x_help-block" hidden="hidden">알림 클릭시 이동할 URL을 지정합니다. URL을 입력하지 않을 경우 이동하지 않습니다. 기본값: [@target_url]</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_icon" class="x_control-label">알림 아이콘</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_icon">
+                        <input type="text" value="{$val['icon']}" name="ncenterlite[types][{$key}][icon]" id="ncenterlite_{$key}_icon" style="width:450px;"></label>
+                    <a href="#ncenterlite_{$key}_icon_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_icon_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_icon_help" class="x_help-block" hidden="hidden">알림 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.<BR>
+                    기본값 : [@profile_image}</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_image" class="x_control-label">알림 이미지</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_image">
+                        <input type="text" value="{$val['image']}" name="ncenterlite[types][{$key}][image]" id="ncenterlite_{$key}_image" style="width:450px;"></label>
+                    <a href="#ncenterlite_{$key}_image_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_image_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_image_help" class="x_help-block" hidden="hidden">알림에 사용될 2:1(가로:세로) 비율의 이미지의 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 이미지를 출력하지 않습니다.
+                    <BR>
+                        기본값 : [@image] (게시글만 해당)
+                    </p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_action1" class="x_control-label">알림 ACTION 1</label>
+                <div class="x_controls">
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1">
+                            <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                            <input type="text" value="{$val['actions'][0]['action']}"|cond="count($val['actions']) > 0" name="ncenterlite[types][{$key}][action1]" id="ncenterlite_{$key}_action1" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1_button_text">
+                            <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                            <input type="text" value="{$val['actions'][0]['title']}"|cond="count($val['actions']) > 0" name="ncenterlite[types][{$key}][action1_title]" id="ncenterlite_{$key}_action1_button_text" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1_icon_url">
+                            <span style="display: inline-block; width: 100px;">ICON URL</span>
+                            <input type="text" value="{$val['actions'][0]['icon']}"|cond="count($val['actions']) > 0" name="ncenterlite[types][{$key}][action1_icon]" id="ncenterlite_{$key}_action1_icon_url" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1_launch_url">
+                            <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                            <input type="text" value="{$val['actions'][0]['launchUrl']}"|cond="count($val['actions']) > 0" name="ncenterlite[types][{$key}][action1_launch_url]" id="ncenterlite_{$key}_action1_launch_url" style="width:350px;">
+                        </label>
+                    </div>
+
+                    <a href="#ncenterlite_{$key}_action1_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_action1_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_action1_help" class="x_help-block" hidden="hidden">
+                        크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                        Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                        Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                        Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                        LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.<br><br>
+
+                        알림 형태에 따라 [@nick_name], [@target_url] 사용가능
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_action2" class="x_control-label">알림 ACTION 2</label>
+                <div class="x_controls">
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action2">
+                            <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                            <input type="text" value="{$val['actions'][1]['action']}"|cond="count($val['actions']) > 1" name="ncenterlite[types][{$key}][action2]" id="ncenterlite_{$key}_action2" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action2_button_text">
+                            <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                            <input type="text" value="{$val['actions'][1]['title']}"|cond="count($val['actions']) > 1" name="ncenterlite[types][{$key}][action2_title]" id="ncenterlite_{$key}_action2_button_text" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action2_icon_url">
+                            <span style="display: inline-block; width: 100px;">ICON URL</span>
+                            <input type="text" value="{$val['actions'][1]['icon']}"|cond="count($val['actions']) > 1" name="ncenterlite[types][{$key}][action2_icon]" id="ncenterlite_{$key}_action2_icon_url" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action2_launch_url">
+                            <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                            <input type="text" value="{$val['actions'][1]['launchUrl']}"|cond="count($val['actions']) > 1" name="ncenterlite[types][{$key}][action2_launch_url]" id="ncenterlite_{$key}_action2_launch_url" style="width:350px;">
+                        </label>
+                    </div>
+
+                    <a href="#ncenterlite_{$key}_action2_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_action2_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_action2_help" class="x_help-block" hidden="hidden">
+                        크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                        Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                        Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                        Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                        LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.<br><br>
+
+                        알림 형태에 따라 [@nick_name], [@target_url] 사용가능
+                    </p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_action1" class="x_control-label">알림 ACTION 3</label>
+                <div class="x_controls">
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1">
+                            <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                            <input type="text" value="{$val['actions'][2]['action']}"|cond="count($val['actions']) > 2" name="ncenterlite[types][{$key}][action3]" id="ncenterlite_{$key}_action3" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1_button_text">
+                            <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                            <input type="text" value="{$val['actions'][2]['title']}"|cond="count($val['actions']) > 2" name="ncenterlite[types][{$key}][action3_title]" id="ncenterlite_{$key}_action3_button_text" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1_icon_url">
+                            <span style="display: inline-block; width: 100px;">ICON URL</span>
+                            <input type="text" value="{$val['actions'][2]['icon']}"|cond="count($val['actions']) > 2" name="ncenterlite[types][{$key}][action3_icon]" id="ncenterlite_{$key}_action3_icon_url" style="width:350px;">
+                        </label>
+                    </div>
+                    <div>
+                        <label class="x_inline" for="ncenterlite_{$key}_action1_launch_url">
+                            <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                            <input type="text" value="{$val['actions'][2]['launchUrl']}"|cond="count($val['actions']) > 2" name="ncenterlite[types][{$key}][action3_launch_url]" id="ncenterlite_{$key}_action3_launch_url" style="width:350px;">
+                        </label>
+                    </div>
+
+                    <a href="#ncenterlite_{$key}_action3_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_action3_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_action3_help" class="x_help-block" hidden="hidden">
+                        크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                        Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                        Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                        Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                        LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.<br><br>
+
+                        알림 형태에 따라 [@nick_name], [@target_url] 사용가능
+                    </p>
+                </div>
+            </div>
+
+
+
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_badge" class="x_control-label">뱃지 아이콘 URL</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_badge">
+                        <input type="text" value="{$val['badge']}" name="ncenterlite[types][{$key}][badge]" id="ncenterlite_{$key}_badge" style="width:450px;"></label>
+                    <a href="#ncenterlite_{$key}_badge_help" class="x_icon-question-sign" data-toggle="#member_push_badge_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_badge_help" class="x_help-block" hidden="hidden">뱃지 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label class="x_control-label">고요 모드</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_use_silent">
+                        <input type="radio" id="ncenterlite_{$key}_use_silent" name="ncenterlite[types][{$key}][silent]" value="Y" checked="checked"|cond="$val['silent']">{$lang->use}</label>
+
+                    <label class="x_inline" for="ncenterlite_{$key}_not_use_silent">
+                        <input type="radio" id="ncenterlite_{$key}_not_use_silent" name="ncenterlite[types][{$key}][silent]" value="N" checked="checked"|cond="!$val['silent']">{$lang->not_use}</label>
+                    <a href="#ncenterlite_{$key}_silent_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_silent_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_silent_help" class="x_help-block" hidden="hidden">알림 출력시 기본으로 출력되는 소리, 진동 없이 알림 팝업만 출력합니다.</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label class="x_control-label">RequireInteraction</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_use_requireinteraction">
+                        <input type="radio" id="ncenterlite_{$key}_use_requireinteraction" name="ncenterlite[types][{$key}][requireInteraction]" value="Y" checked="checked"|cond="$val['requireInteraction']">{$lang->use}</label>
+
+                    <label class="x_inline" for="ncenterlite_{$key}_not_use_requireinteraction">
+                        <input type="radio" id="ncenterlite_{$key}_not_use_requireinteraction" name="ncenterlite[types][{$key}][requireInteraction]" value="N" checked="checked"|cond="!$val['requireInteraction']">{$lang->not_use}</label>
+                    <a href="#ncenterlite_{$key}_requireinteraction_help_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_requireinteraction_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_requireinteraction_help" class="x_help-block" hidden="hidden">이 기능을 활성화할 경우 크롬 브라우저에서 알림 출력시 사용자가 마우스로 클릭하기 전까지는 알림 팝업을 닫지 않습니다.</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label class="x_control-label">재알림</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_use_renotify">
+                        <input type="radio" id="ncenterlite_{$key}_use_renotify" name="ncenterlite[types][{$key}][renotify]" value="Y" checked="checked"|cond="$val['renotify']">{$lang->use}</label>
+
+                    <label class="x_inline" for="ncenterlite_{$key}_not_use_renotify">
+                        <input type="radio" id="ncenterlite_{$key}_not_use_renotify" name="ncenterlite[types][{$key}][renotify]" value="N" checked="checked"|cond="!$val['renotify']">{$lang->not_use}</label>
+                    <a href="#ncenterlite_{$key}_renotify_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_renotify_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_renotify_help" class="x_help-block" hidden="hidden">이 기능을 활성화할 경우 크롬 브라우저에서 이미 출력중인 알림이 있더라도 새로운 알림을 강제로 출력합니다.</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label class="x_control-label">수명 (TTL)</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_ttl">
+                        <input type="number" min="0" value="{$val['ttl']}" name="ncenterlite[types][{$key}][ttl]}" id="ncenterlite_{$key}_ttl" style="width:100px;"></label>
+
+                    <a href="#ncenterlite_{$key}_ttl_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_ttl_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_ttl_help" class="x_help-block" hidden="hidden">메세지 수명을 설정합니다. 단위 : 초, 기본값 : 2주</p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label class="x_control-label">알림 우선순위</label>
+                <div class="x_controls">
+                    <label class="x_inline" for="ncenterlite_{$key}_urgency_very-low">
+                        <input type="radio" id="ncenterlite_{$key}_urgency_very-low" name="ncenterlite[types][{$key}][urgency]" value="very-low" checked="checked"|cond="$val['urgency'] === 'very-low'">매우 낮음</label>
+
+                    <label class="x_inline" for="ncenterlite_{$key}_urgency_low">
+                        <input type="radio" id="ncenterlite_{$key}_urgency_low" name="ncenterlite[types][{$key}][urgency]" value="low" checked="checked"|cond="$val['urgency'] === 'low'">낮음</label>
+
+                    <label class="x_inline" for="ncenterlite_{$key}}_urgency_normal">
+                        <input type="radio" id="ncenterlite_{$key}}_urgency_normal" name="ncenterlite[types][{$key}][urgency]" value="normal" checked="checked"|cond="$val['urgency'] === 'normal'">보통</label>
+
+                    <label class="x_inline" for="ncenterlite_{$key}}_urgency_high">
+                        <input type="radio" id="ncenterlite_{$key}}_urgency_high" name="ncenterlite[types][{$key}][urgency]" value="high" checked="checked"|cond="$val['urgency'] === 'high'">높음</label>
+
+                    <a href="#ncenterlite_{$key}_urgency_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_urgency_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_urgency_help" class="x_help-block" hidden="hidden">알림의 우선순위를 정합니다. 기본값 : normal<BR><BR>
+                        매우 낮음 : 전원(충전)이 공급중이고 와이파이 수신중일때 (광고)<BR>
+                        낮음 : 전원이 공급중이거나 와이파이가 연결되었을때 (공지)<BR>
+                        보통 : 전원, 와이파이 둘 다 사용중이지 않을때 (채팅, 메신저)<BR>
+                        높음 : 잔여 배터리가 부족할때 (전화, 중요하거나 급한 공지)<BR><BR>
+                        <span style="color: red">안드로이드와 같은 일부 단말기(브라우저)에선 '높음'으로 분류된 메세지의 전송빈도가 높을 경우 브라우저 정책 위반으로 출력이 안될 수 있습니다.</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="x_control-group">
+                <label for="ncenterlite_{$key}_push_group" class="x_control-label">푸시 그룹</label>
+                <div class="x_controls">
+
+                    <select name="ncenterlite[types][{$key}][pushGroupSrl]" id="ncenterlite_{$key}_push_group">
+                        <option loop="$pushGroupList => $pushGroupKey, $pushGroupVal" value="{$pushGroupVal['push_group_srl']}" selected|cond="$val['pushGroupSrl'] == $pushGroupVal['push_group_srl']">{$pushGroupVal['name']}</option>
+                    </select>
+
+                    <a href="#ncenterlite_{$key}_push_group_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_push_group_help">{$lang->help}</a>
+                    <p id="ncenterlite_{$key}_push_group_help" class="x_help-block" hidden="hidden">푸시 알림의 그룹을 설정합니다. 같은 그룹의 알림을 한 개의 알림으로 묶어 처리합니다.</p>
+                </div>
+            </div>
+
+
+        </section>
+
+    </block>
+
+
+
+    <div class="x_clearfix btnArea">
+        <span class="x_pull-right"><input class="x_btn x_btn-primary" type="submit" value="{$lang->cmd_save}"></span>
+    </div>
+
+
+</form>

@@ -1,0 +1,26 @@
+<query id="insertNotiManualPushLog" action="insert">
+    <tables>
+        <table name="noti_manual_push" />
+    </tables>
+    <columns>
+        <column name="manual_push_srl" var="manual_push_srl" notnull="notnull" filter="number" />
+        <column name="member_srl" var="member_srl" notnull="notnull" default="0" filter="number" />
+        <column name="nick_name" var="nick_name" notnull="notnull" />
+        <column name="type" var="type" />
+        <column name="title" var="title" />
+        <column name="content" var="content" />
+        <column name="ipaddress" var="ipaddress" />
+        <column name="icon" var="icon" />
+        <column name="image" var="image" />
+        <column name="badge" var="badge" />
+        <column name="target_url" var="target_url" />
+        <column name="renotify" var="renotify" />
+        <column name="silent" var="silent" />
+        <column name="urgency" var="urgency" />
+        <column name="ttl" var="ttl" default="0" filter="number" />
+        <column name="require_interaction" var="require_interaction" />
+        <column name="send_count" var="send_count" />
+        <column name="push_group_srl" var="push_group_srl" />
+        <column name="regdate" var="regdate" notnull="notnull" filter="number" />
+    </columns>
+</query>

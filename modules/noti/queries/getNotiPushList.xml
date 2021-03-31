@@ -1,0 +1,37 @@
+<query id="getNotiPushList" action="select">
+    <tables>
+        <table name="noti_push" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="member_srl" var="member_srl" />
+        <group pipe="and">
+            <condition operation="equal" column="endpoint_srl" var="s_endpoint_srl" pipe="or" />
+            <condition operation="equal" column="type" var="s_type" pipe="or" />
+            <condition operation="equal" column="member_srl" var="s_member_srl" pipe="or" />
+            <condition operation="like" column="nick_name" var="s_nick_name" pipe="or" />
+            <condition operation="equal" column="sender_member_srl" var="s_sender_member_srl" pipe="or" />
+            <condition operation="like" column="sender_nick_name" var="s_sender_nick_name" pipe="or" />
+            <condition operation="like" column="content_summary" var="s_content_summary" pipe="or" />
+            <condition operation="like" column="push_payload" var="s_push_payload" pipe="or" />
+            <condition operation="like" column="target_url" var="s_target_url" pipe="or" />
+            <condition operation="like_prefix" column="read_ipaddress" var="s_ipaddress" pipe="or" />
+            <condition operation="like_prefix" column="click_ipaddress" var="s_ipaddress" pipe="or" />
+            <condition operation="like_prefix" column="regdate" var="s_regdate" pipe="or" />
+            <condition operation="equal" column="status_code" var="s_status_code" pipe="or" />
+        </group>
+        <group pipe="and">
+            <condition operation="equal" column="is_readed" var="is_readed" pipe="or" />
+            <condition operation="equal" column="is_clicked" var="is_clicked" pipe="or" />
+            <condition operation="notequal" column="status_code" var="status_code_without" pipe="or" />
+        </group>
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="regdate" order="order_type" />
+        <list_count var="list_count" default="30" />
+        <page_count var="page_count" default="10" />
+        <page var="page" default="1" />
+    </navigation>
+</query>

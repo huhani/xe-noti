@@ -1,0 +1,45 @@
+<div class="x_page-header">
+	<h1>
+		{$lang->noti}
+	</h1>
+</div>
+
+{@
+
+$pushLogMenu = array('dispNotiAdminPushLogList', 'dispNotiAdminPushLogView');
+$manualPushMenu = array('dispNotiAdminManualPushInsert', 'dispNotiAdminManualPushList');
+$pushGroupMenu = array('dispNotiAdminPushGroupList', 'dispNotiAdminPushGroupInsert');
+$endpointMenu = array('dispNotiAdminEndpointList', 'dispNotiAdminEndpointView');
+
+}
+
+
+<ul class="x_nav x_nav-tabs">
+	<li class="x_active"|cond="$act == 'dispNotiAdminModuleState'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminModuleState')}">상태</a>
+	</li>
+	<li class="x_active"|cond="$act == 'dispNotiAdminModuleConfig'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminModuleConfig')}">모듈</a>
+	</li>
+	<li class="x_active"|cond="$act == 'dispNotiAdminNcenterliteConfig'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminNcenterliteConfig')}">알림센터 연동</a>
+	</li>
+
+	<li class="x_active"|cond="in_array($act, $manualPushMenu)">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminManualPushList')}">수동 전송</a>
+	</li>
+	<li class="x_active"|cond="in_array($act, $pushGroupMenu)">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushGroupList')}">알림 그룹</a>
+	</li>
+	<li class="x_active"|cond="in_array($act, $endpointMenu)">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminEndpointList')}">푸시 장치 목록</a>
+	</li>
+	<li class="x_active"|cond="in_array($act, $pushLogMenu)">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList')}">발송 로그</a>
+	</li>
+
+	<li class="x_active"|cond="$act == 'dispNotiAdminInspectView'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminInspectView')}">점검</a>
+	</li>
+
+</ul>

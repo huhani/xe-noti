@@ -1,0 +1,226 @@
+<include target="_header.html" />
+
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == ''" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+    <p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+
+
+<section class="section">
+    <h1>발송로그 일괄 삭제<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+    <form action="/" method="post" class="x_form-horizontal deletePushLogWithOptions">
+        <input type="hidden" name="module" value="{$module}">
+        <input type="hidden" name="act" value="procNotiAdminPushLogDeleteWithOptions">
+        <input type="hidden" name="success_return_url" value="{getUrl('', 'module', 'admin', 'act', 'dispNotiAdminModuleConfig')}">
+
+        <div class="x_control-group">
+            <label class="x_control-label" for="push_log_target_name">대상 종류</label>
+            <div class="x_controls">
+                <label class="x_inline" for="push_log_target_name">
+                    <select name="target_name" id="push_log_target_name">
+                        <option value="endpoint_srl">endpoint_srl</option>
+                        <option value="nick_name">수신자 닉네임 (등록당시)</option>
+                        <option value="nick_name_now">수신자 닉네임 (현재)</option>
+                        <option value="mebmer_srl">수신자 회원번호</option>
+                        <option value="sender_nick_name">수신자 닉네임 (등록당시)</option>
+                        <option value="sender_nick_name_now">수신자 닉네임 (현재)</option>
+                        <option value="sender_mebmer_srl">수신자 회원번호</option>
+                        <option value="document_srl">문서번호</option>
+                        <option value="target_srl">대상번호</option>
+                        <option value="type">종류</option>
+                        <option value="content_summary">알림내용</option>
+                        <option value="push_payload">Payload</option>
+                        <option value="status_code">StatusCode</option>
+                        <option value="target_url">URL</option>
+                        <option value="ipaddress">IP주소</option>
+                        <option value="regdate">등록일</option>
+                        <option value="">전체</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label" for="push_log_target_keyword">대상 값</label>
+            <div class="x_controls">
+                <label class="x_inline" for="push_log_target_keyword">
+                    <input name="target_keyword" id="push_log_target_keyword" type="text" />
+                </label>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label" for="push_log_date_range">삭제 범위</label>
+            <div class="x_controls">
+                <label class="x_inline" for="push_log_date_range">
+                    <select name="date_range" id="push_log_date_range">
+                        <option value="1">최근 1일</option>
+                        <option value="7">최근 7일</option>
+                        <option value="30">최근 30일</option>
+                        <option value="180">최근 180일</option>
+                        <option value="365">최근 365일</option>
+                        <option value="1095">최근 3년</option>
+                        <option value="0">전체</option>
+                    </select>
+                </label>
+                <BR>
+            </div>
+        </div>
+
+
+        <div class="x_clearfix btnArea">
+            <span class="x_pull-right"><input class="x_btn x_btn-primary" type="submit" value="{$lang->cmd_delete}"></span>
+        </div>
+    </form>
+
+</section>
+
+
+
+<section class="section">
+    <h1>단말기 일괄 삭제<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+    <form action="/" method="post" class="x_form-horizontal">
+        <div class="x_control-group">
+            <label class="x_control-label">대상 종류</label>
+            <div class="x_controls">
+                <label class="x_inline" for="endpoint_target_name">
+                    <select name="target_name" id="endpoint_target_name">
+                        <option value="nick_name">수신자 닉네임 (등록당시)</option>
+                        <option value="nick_name_now">수신자 닉네임 (현재)</option>
+                        <option value="mebmer_srl">수신자 회원번호</option>
+                        <option value="ipaddress">IP주소</option>
+                        <option value="regdate">등록일</option>
+                    </select>
+                </label>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">대상 값</label>
+            <div class="x_controls">
+                <input name="endpoint_target_keyword" id="endpoint_target_keyword" type="text" />
+            </div>
+        </div>
+
+        <div class="x_clearfix btnArea">
+            <span class="x_pull-right"><input class="x_btn x_btn-primary" type="submit" value="{$lang->cmd_delete}"></span>
+        </div>
+    </form>
+</section>
+
+
+
+<section class="section">
+    <h1>휴먼 단말기 삭제<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+    <form action="/" method="post" class="x_form-horizontal">
+        <div class="x_control-group">
+            <label class="x_control-label">대상 종류</label>
+            <div class="x_controls">
+                <select name="target_name" id="dormant_target_name">
+                    <option value="last_send">마지막 발신일</option>
+                    <option value="last_read">마지막 수신일</option>
+                    <option value="last_click">마지막 클릭일</option>
+                    <option value="regdate">등록일</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label" for="dormant_date">시점</label>
+            <div class="x_controls">
+                <input type="hidden" name="dormant_date" id="date_dormant_date" value="{$member_info->limit_date}" />
+                <input type="date" readonly placeholder="YYYY-MM-DD" id="dormant_date" min="{date('Y-m-d',strtotime('-10 years'))}" max="{date('Y-m-d',strtotime('+100 years'))}" onchange="jQuery('#date_dormant_date').val(this.value.replace(/-/g,''));" value="{date('Y-m-d',strtotime('-1 years'))}" /> 이전의 단말기 삭제
+            </div>
+        </div>
+
+        <div class="x_clearfix btnArea">
+            <span class="x_pull-right"><input class="x_btn x_btn-primary" type="submit" value="{$lang->cmd_delete}"></span>
+        </div>
+    </form>
+</section>
+
+
+<script>
+    (function($){
+
+        function deletePushLogWithOptions(type, value, dateRange) {
+            exec_json('noti.procNotiAdminPushLogDeleteByOptions', {
+                target_name: type,
+                target_keyword: value,
+                date_range: dateRange
+            }, function(ret_obj) {
+                alert("삭제하였습니다.");
+            });
+        }
+
+        $(document).ready(function(){
+            $('#push_log_target_name').on('change', function(){
+                var $this = $(this);
+                if(!$this.val()) {
+                    $('input[name=target_keyword]').attr('disabled', 'disabled');
+                } else {
+                    $('input[name=target_keyword]').removeAttr('disabled');
+                }
+            });
+
+
+            if ( $("#dormant_date").prop('type') != 'date' ) {
+                var option = {
+                    changeMonth: true,
+                    changeYear: true,
+                    gotoCurrent: false,
+                    yearRange:'-200:+10',
+                    dateFormat:'yy-mm-dd',
+                    defaultDate: new Date("{date('Y-m-d',time())}"),
+                    minDate: new Date("{date('Y-m-d',strtotime('-200 years'))}"),
+
+                    onSelect:function(){
+                        $(this).prev('input[type="hidden"]').val(this.value.replace(/-/g,""))
+                        if($('#until').val()){
+                            limited_reason_division.slideDown(200);
+                        } else {
+                            limited_reason_division.slideUp(200);
+                        }
+                    }
+                };
+                $.extend($.datepicker.regional['{$lang_type}'], option);
+                $("#dormant_date").datepicker(option);
+            } else {
+                $("#dormant_date").prop('readonly', false);
+            }
+
+        });
+
+        $(document).on('click', '.deletePushLogWithOptions input[type=submit]', function(){
+            var $deletePushLogWithOptions = $('.deletePushLogWithOptions');
+            var $type = $deletePushLogWithOptions.find('select[name=target_name]').val();
+            var $value = $deletePushLogWithOptions.find('input[name=target_keyword]').val();
+            var $dateRange = $deletePushLogWithOptions.find('select[name=date_range]').val();
+            if($type && !$value) {
+                alert('일괄삭제할 발송로그 대상 값을 입력하세요.');
+                return false;
+            }
+            exec_json('noti.getNotiAdminPushLogCount', {
+                target_name: $type,
+                target_keyword: $value,
+                date_range: $dateRange
+            }, function(ret_obj){
+                var count = ret_obj.count;
+                if(count > 0) {
+                    var msg = confirm(count+"개의 발송로그를 삭제하시겠습니까?");
+                    if(msg) {
+                        deletePushLogWithOptions($type, $value, $dateRange);
+                    }
+                } else {
+                    alert('삭제할 데이터가 없습니다.');
+                }
+            });
+
+            return false;
+        });
+
+    })(window.jQuery);
+</script>

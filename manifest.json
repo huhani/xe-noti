@@ -1,0 +1,9 @@
+{
+  "gcm_sender_id": "97276647298",
+  "name": "테스트서버",
+  "short_name": "testserver",
+  "start_url": "/index.php",
+  "display": "standalone",
+  "theme_color": "#2e3aa1",
+  "background_color": "#ffffff"
+}

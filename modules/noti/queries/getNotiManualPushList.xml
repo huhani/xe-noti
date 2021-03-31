@@ -1,0 +1,24 @@
+<query id="getNotiManualPushList" action="select">
+    <tables>
+        <table name="noti_manual_push" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="member_srl" var="s_member_srl" filter="number" />
+        <condition operation="equal" column="nick_name" var="s_nick_name" pipe="or" />
+        <condition operation="like" column="title" var="s_title" pipe="or" />
+        <condition operation="like" column="content" var="s_content" pipe="or" />
+        <condition operation="like" column="icon" var="s_icon" pipe="or" />
+        <condition operation="like" column="image" var="s_image" pipe="or" />
+        <condition operation="like" column="target_url" var="s_target_url" pipe="or" />
+        <condition operation="like_prefix" column="regdate" var="s_regdate" pipe="or" />
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="regdate" order="order_type" />
+        <list_count var="list_count" default="30" />
+        <page_count var="page_count" default="10" />
+        <page var="page" default="1" />
+    </navigation>
+</query>

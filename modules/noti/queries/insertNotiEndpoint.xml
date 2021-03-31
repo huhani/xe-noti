@@ -1,0 +1,22 @@
+<query id="insertNotiEndpoint" action="insert">
+	<tables>
+		<table name="noti_endpoint" />
+	</tables>
+	<columns>
+		<column name="endpoint_srl" var="endpoint_srl" notnull="notnull" filter="number" />
+		<column name="member_srl" var="member_srl" notnull="notnull" filter="number" />
+		<column name="nick_name" var="nick_name" />
+		<column name="ipaddress" var="ipaddress" />
+		<column name="user_agent" var="user_agent" />
+		<column name="browser" var="browser" />
+		<column name="platform" var="platform" />
+
+		<column name="endpoint_crc32" var="endpoint_crc32" notnull="notnull" filter="number" />
+		<column name="endpoint" var="endpoint" notnull="notnull" />
+		<column name="auth" var="auth" />
+		<column name="key" var="key" />
+		<column name="supported_encoding" var="supported_encoding" />
+		<column name="last_update" var="last_update" notnull="notnull" />
+		<column name="regdate" var="regdate" notnull="notnull" />
+	</columns>
+</query>

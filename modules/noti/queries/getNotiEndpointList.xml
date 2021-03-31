@@ -1,0 +1,29 @@
+<query id="getNotiEndpointList" action="select">
+    <tables>
+        <table name="noti_endpoint" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="member_srl" var="s_member_srl" filter="number" />
+        <group pipe="and">
+            <condition operation="equal" column="endpoint_srl" var="s_endpoint_srl" pipe="or" />
+            <condition operation="equal" column="endpoint_crc32" var="s_endpoint_crc32" pipe="or" />
+            <condition operation="like" column="browser" var="s_browser" pipe="or" />
+            <condition operation="like" column="user_agent" var="s_user_agent" pipe="or" />
+            <condition operation="like" column="platform" var="s_platform" pipe="or" />
+            <condition operation="like" column="endpoint" var="s_endpoint" pipe="or" />
+            <condition operation="like" column="auth" var="s_auth" pipe="or" />
+            <condition operation="like" column="key" var="s_key" pipe="or" />
+            <condition operation="like_prefix" column="regdate" var="s_regdate" pipe="or" />
+            <condition operation="like_prefix" column="ipaddress" var="s_ipaddress" pipe="or" />
+        </group>
+    </conditions>
+    <navigation>
+        <index var="sort_index" default="regdate" order="order_type" />
+        <list_count var="list_count" default="30" />
+        <page_count var="page_count" default="10" />
+        <page var="page" default="1" />
+    </navigation>
+</query>

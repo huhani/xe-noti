@@ -1,0 +1,12 @@
+<query id="getNotiEndpointByCRC32" action="select">
+    <tables>
+        <table name="noti_endpoint" />
+    </tables>
+    <columns>
+        <column name="*" />
+    </columns>
+    <conditions>
+        <condition operation="equal" column="endpoint_crc32" var="endpoint_crc32" notnull="notnull" />
+        <condition operation="equal" column="endpoint" var="endpoint" notnull="notnull" pipe="and" />
+    </conditions>
+</query>

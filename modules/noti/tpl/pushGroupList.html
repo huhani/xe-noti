@@ -1,0 +1,74 @@
+<include target="_header.html" />
+
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == ''" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+	<p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+
+<form id="fo_list" action="./" method="get">
+	<input type="hidden" name="module" value="{$module}" />
+	<input type="hidden" name="page" value="{$page}" />
+	<table id="notiListTable" class="x_table x_table-striped x_table-hover noti noti_list">
+
+
+		<thead>
+
+			<tr>
+				<th>푸시 그룹명</th>
+				<th>알림 출력 개수</th>
+				<th>알림누적 사용</th>
+				<th>설정</th>
+			</tr>
+
+		</thead>
+
+		<tbody>
+
+			<tr loop="$pushGroupList => $push_group_srl, $each">
+				<td>
+					{$each['name']}
+				</td>
+
+				<td>
+					{$each['max_count'] > 0 ? $each['max_count'] : "무제한"}
+				</td>
+
+				<td>
+					{$each['use_count_summary'] ? "사용" : "사용 안 함"}
+				</td>
+
+				<td>
+					<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushGroupInsert', 'push_group_srl', $push_group_srl)}" class="x_btn x_btn-normal">수정</a>
+					<a href="javascript:;" class="x_btn x_btn-normal notiPushGroupDelete" data-src="{$push_group_srl}" title="푸시 그룹 삭제">삭제</a>
+				</td>
+
+			</tr>
+
+		</tbody>
+	</table>
+
+	<div class="x_clearfix btnArea">
+		<span class="x_pull-right"><a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushGroupInsert')}" class="x_btn x_btn-primary">푸시 그룹 추가</a></span>
+	</div>
+</form>
+
+
+<script>
+	(function($) {
+		$(document).on('click', '.notiPushGroupDelete', function(e) {
+			var $this = $(this);
+			var push_group_srl = $this.attr('data-src');
+			if(!push_group_srl) {
+				return;
+			}
+
+			exec_json("noti.procNotiAdminPushGroupDelete", {push_group_srl: push_group_srl}, function(ret_obj){
+				window.location.reload();
+			});
+
+			return false;
+		});
+	})(jQuery);
+
+
+</script>

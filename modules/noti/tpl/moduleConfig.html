@@ -1,0 +1,1180 @@
+<include target="_header.html" />
+
+<!--TODO-->
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == ''" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+    <p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+<form action="/" method="post" class="x_form-horizontal">
+    <input type="hidden" name="module" value="noti">
+    <input type="hidden" name="act" value="procNotiAdminModuleConfig">
+    <input type="hidden" name="success_return_url" value="{getUrl('', 'module', 'admin', 'act', 'dispNotiAdminModuleConfig')}">
+
+
+    <section class="section">
+        <h1>전체<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+        <div class="x_control-group">
+            <label class="x_control-label">모듈 사용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="this_module_use">
+                    <input type="radio" id="this_module_use" name="notiConfig[use]" value="Y" checked="checked"|cond="$notiConfig['use']">{$lang->use}</label>
+
+                <label class="x_inline" for="this_module_not_use">
+                    <input type="radio" id="this_module_not_use" name="notiConfig[use]" value="N" checked="checked"|cond="!$notiConfig['use']">{$lang->not_use}</label>
+                <a href="#this_module_help" class="x_icon-question-sign" data-toggle="#this_module_help">{$lang->help}</a>
+                <p id="this_module_help" class="x_help-block" hidden="hidden">모듈 사용을 설정합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">설정 상태</label>
+            <div class="x_controls">
+
+                <!--@if($configFulfilled)-->
+                <span style="color:#00c300;font-weight: bold; position:relative; top: 5px;">작동</span>
+                <!--@else-->
+                <span style="color:red;font-weight: bold; position:relative; top: 5px;">정지. 필수로 입력되어야 할 설정값이 누락되어있습니다.</span>
+                <!--@end-->
+
+                <a href="#this_module_config_fulfilled_help" class="x_icon-question-sign" data-toggle="#this_module_config_fulfilled_help">{$lang->help}</a>
+                <p id="this_module_config_fulfilled_help" class="x_help-block" hidden="hidden"> 정지 상태일 경우 모듈의 '푸시 서버 설정', '메세지 큐 서버 설정' 항목을 모두 입력해주세요.<BR>
+                    작동중이여도 rabbitmq, nodejs서버가 동작중이지 않거나 연동이 제대로 되지 않을 경우 동작하지 않습니다.</p>
+            </div>
+        </div>
+
+    </section>
+
+
+    <section class="section">
+        <h1>푸시 서버 설정<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+        
+        <div class="x_control-group">
+            <label for="vapid_public_key" class="x_control-label">VAPID Public Key</label>
+            <div class="x_controls">
+                <label class="x_inline" for="vapid_public_key">
+                    <textarea name="notiConfig[Push][vapidPublicKey]" id="vapid_public_key" rows="2" style="width:450px;">{$notiConfig['Push']['vapidPublicKey']}</textarea></label>
+                <a href="#vapid_public_key_help" class="x_icon-question-sign" data-toggle="#vapid_public_key_help">{$lang->help}</a>
+                <p id="vapid_public_key_help" class="x_help-block" hidden="hidden">VAPID를 이용하여 푸시 알림을 보낼 경우 사용할 Public Key를 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="vapid_private_key" class="x_control-label">VAPID Private Key</label>
+            <div class="x_controls">
+                <label class="x_inline" for="vapid_private_key">
+                    <textarea name="notiConfig[Push][vapidPrivateKey]" id="vapid_private_key" rows="2" style="width:450px;">{$notiConfig['Push']['vapidPrivateKey']}</textarea></label>
+                <a href="#vapid_private_key_help" class="x_icon-question-sign" data-toggle="#vapid_private_key_help">{$lang->help}</a>
+                <p id="vapid_private_key_help" class="x_help-block" hidden="hidden">VAPID를 이용하여 푸시 알림을 보낼 경우 사용할 Private Key를 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="vapid_claim_subject" class="x_control-label">VAPID Subject</label>
+            <div class="x_controls">
+                <label class="x_inline" for="vapid_claim_subject">
+                    <textarea name="notiConfig[Push][vapidSubject]" id="vapid_claim_subject" rows="1" style="width:450px;">{$notiConfig['Push']['vapidSubject']}</textarea></label>
+                <a href="#vapid_claim_subject_help" class="x_icon-question-sign" data-toggle="#vapid_claim_subject_help">{$lang->help}</a>
+                <p id="vapid_claim_subject_help" class="x_help-block" hidden="hidden">VAPID 클레임에 사용될 subject를 입력합니다. 알림 전송에 참조할 이메일(혹은 사이트 주소)을 입력해주세요. 이메일 입력 권장.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="endpoint_filter" class="x_control-label">endpoint Filter</label>
+            <div class="x_controls">
+                <label class="x_inline" for="endpoint_filter">
+
+                    <textarea name="notiConfig[Push][endpointFilter]" id="endpoint_filter" rows="6" style="width:450px;">{implode("\r\n", $notiConfig['Push']['endpointFilter'])}</textarea>
+
+
+                </label>
+                <a href="#endpoint_filter_help" class="x_icon-question-sign" data-toggle="#endpoint_filter_help">{$lang->help}</a>
+                <p id="endpoint_filter_help" class="x_help-block" hidden="hidden">
+                    보안을 위해 클라이언트 단말기의 endpoint 구독정보를 제한적으로 등록합니다. <BR>
+                    행으로 규칙을 구분합니다.<BR>
+                    기본값 : https://fcm.googleapis.com/, https://updates.push.services.mozilla.com/, https://bn3p.notify.windows.com/, https://sg2p.notify.windows.com/<BR>
+                    값은 https://로 시작해야 하며 도메인(IP)의 끝은 /로 끝나야 합니다.<BR><BR>
+
+                    <span style="color:red;">특별한 목적이 있지 않은 경우 이 값을 수정하지 마세요.</span><BR>
+                </p>
+            </div>
+        </div>
+
+
+    </section>
+
+    <section class="section">
+        <h1>메세지 큐 서버 설정<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+
+        <div class="x_control-group">
+            <label for="mq_server_host" class="x_control-label">메세지 큐 서버 IP</label>
+            <div class="x_controls">
+                <label class="x_inline" for="mq_server_host">
+                    <textarea name="notiConfig[MessageQueue][host]" id="mq_server_host" rows="1" style="width:250px;">{$notiConfig['MessageQueue']['host']}</textarea></label>
+                <a href="#mq_server_host_help" class="x_icon-question-sign" data-toggle="#mq_server_host_help">{$lang->help}</a>
+                <p id="mq_server_host_help" class="x_help-block" hidden="hidden">메세지 큐 서버 IP를 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="mq_server_port" class="x_control-label">메세지 큐 서버 포트</label>
+            <div class="x_controls">
+                <label class="x_inline" for="mq_server_port">
+                    <textarea name="notiConfig[MessageQueue][port]" id="mq_server_port" rows="1" style="width:250px;">{$notiConfig['MessageQueue']['port']}</textarea></label>
+                <a href="#mq_server_port_help" class="x_icon-question-sign" data-toggle="#mq_server_port_help">{$lang->help}</a>
+                <p id="mq_server_port_help" class="x_help-block" hidden="hidden">메세지 큐 서버 포트를 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="mq_server_vhost" class="x_control-label">메세지 큐 VHOST</label>
+            <div class="x_controls">
+                <label class="x_inline" for="mq_server_vhost">
+                    <textarea name="notiConfig[MessageQueue][vhost]" id="mq_server_vhost" rows="1" style="width:250px;">{$notiConfig['MessageQueue']['vhost']}</textarea></label>
+                <a href="#mq_server_vhost_help" class="x_icon-question-sign" data-toggle="#mq_server_vhost_help">{$lang->help}</a>
+                <p id="mq_server_vhost_help" class="x_help-block" hidden="hidden">메세지 큐 서버에서 사용할 가상호스트를 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="mq_server_id" class="x_control-label">메세지 큐 서버접속 ID</label>
+            <div class="x_controls">
+                <label class="x_inline" for="mq_server_id">
+                    <textarea name="notiConfig[MessageQueue][user]" id="mq_server_id" rows="1" style="width:250px;">{$notiConfig['MessageQueue']['user']}</textarea></label>
+                <a href="#mq_server_id_help" class="x_icon-question-sign" data-toggle="#mq_server_id_help">{$lang->help}</a>
+                <p id="mq_server_id_help" class="x_help-block" hidden="hidden">메세지 큐 서버접속에 사용할 ID를 입력합니다. 메세지 큐 서버에 계정이 등록되어 있어야 합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="mq_server_password" class="x_control-label">메세지 큐 서버접속 Password</label>
+            <div class="x_controls">
+                <label class="x_inline" for="mq_server_password">
+                    <textarea name="notiConfig[MessageQueue][pw]" id="mq_server_password" rows="1" style="width:250px;">{$notiConfig['MessageQueue']['pw']}</textarea></label>
+                <a href="#mq_server_password_help" class="x_icon-question-sign" data-toggle="#mq_server_password_help">{$lang->help}</a>
+                <p id="mq_server_password_help" class="x_help-block" hidden="hidden">메세지 큐 서버접속에 사용할 계정의 password를 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">큐 퍼지</label>
+            <div class="x_controls">
+                <label class="x_inline">
+                    <a class="modalAnchor x_btn xe-modal-window notiPurgeQueue" href="javascript:;">퍼지</a>
+                </label>
+                <a href="#mq_purge_help" class="x_icon-question-sign" data-toggle="#mq_purge_help">{$lang->help}</a>
+                <p id="mq_purge_help" class="x_help-block" hidden="hidden">
+                    nodejs 서버로 처리 대기중인 큐 데이터를 삭제합니다.<BR>
+                    대량푸시 전송을 긴급히 중단해야 할 경우 node서버 강제종료 요청 후, 이 기능을 사용하세요.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">node서버 강제종료 요청</label>
+            <div class="x_controls">
+                <label class="x_inline">
+                    <a class="modalAnchor x_btn xe-modal-window notiExitNodeServer" href="javascript:;">강제종료</a>
+                </label>
+                <a href="#mq_request_node_exit_help" class="x_icon-question-sign" data-toggle="#mq_request_node_exit_help">{$lang->help}</a>
+                <p id="mq_request_node_exit_help" class="x_help-block" hidden="hidden">
+                    node서버 프로세스 강제종료 시그널을 메세지 큐를 통하여 node서버로 보냅니다.<BR>
+                    이미 전송중인 푸시작업을 무시하고 강제로 서버를 종료합니다.<BR>
+                    대량푸시 전송을 긴급히 중단해야 할 경우 이 기능을 사용한 뒤, 큐 퍼지 기능을 사용하세요.<BR>
+                    node 서버가 강제종료된 후, 다시시작하려면 수동으로 켜야합니다.<BR><BR>
+                    <b>메세지 큐로 전달되는 node서버 강제종료 메세지(시그널)는 다른 메세지들보다 우선순위가 높습니다.</b>
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">서버 접속 테스트</label>
+            <div class="x_controls">
+                <label class="x_inline">
+                    <a class="modalAnchor x_btn xe-modal-window notiMessageQueueTest">테스트</a>
+                </label>
+                <a href="#mq_server_test_help" class="x_icon-question-sign" data-toggle="#mq_server_test_help">{$lang->help}</a>
+                <p id="mq_server_test_help" class="x_help-block" hidden="hidden">메세지 큐 서버로 접속 테스트를 시도합니다.<BR>
+                    정상적으로 연결 테스트가 되더라도 메세지 큐 서버에 exchange, key, queue, 계정 설정이 제대로 되지 않은 경우 전송이 원할하게 되지 않을 수 있습니다.<BR>
+                    메세지 큐 서버가 정상적으로 동작하더라도 nodejs 서버가 작동하지 않을 경우 푸시 전송이 작동하지 않습니다.
+                </p>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="section">
+        <h1>회원 푸시<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+        <div class="x_control-group">
+            <label class="x_control-label">회원 푸시 등록 허용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_allow_insert">
+                    <input type="radio" id="member_push_allow_insert" name="notiConfig[MemberPush][allowInsert]" value="Y" checked="checked"|cond="$notiConfig['MemberPush']['allowInsert']">{$lang->use}</label>
+
+                <label class="x_inline" for="member_push_not_allow_insert">
+                    <input type="radio" id="member_push_not_allow_insert" name="notiConfig[MemberPush][allowInsert]" value="N" checked="checked"|cond="!$notiConfig['MemberPush']['allowInsert']">{$lang->not_use}</label>
+                <a href="#member_allow_insert_help" class="x_icon-question-sign" data-toggle="#member_allow_insert_help">{$lang->help}</a>
+                <p id="member_allow_insert_help" class="x_help-block" hidden="hidden">회원이 푸시 등록을 할 수 있도록 합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">알림 등록 안내 푸시</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_use_notice">
+                    <input type="radio" id="member_push_use_notice" name="notiConfig[MemberPush][sendInsertNotice]" value="Y" checked="checked"|cond="$notiConfig['MemberPush']['sendInsertNotice']">{$lang->use}</label>
+
+                <label class="x_inline" for="member_push_not_use_notice">
+                    <input type="radio" id="member_push_not_use_notice" name="notiConfig[MemberPush][sendInsertNotice]" value="N" checked="checked"|cond="!$notiConfig['MemberPush']['sendInsertNotice']">{$lang->not_use}</label>
+                <a href="#member_push_notice_help" class="x_icon-question-sign" data-toggle="#member_push_notice_help">{$lang->help}</a>
+                <p id="member_push_notice_help" class="x_help-block" hidden="hidden">회원이 푸시 등록에 성공할 경우 푸시 알림이 등록된 단말기로 안내 메세지를 보냅니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">차단된 회원 알림 발송</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_use_sendDeniedMember">
+                    <input type="radio" id="member_push_use_sendDeniedMember" name="notiConfig[MemberPush][sendDeniedMember]" value="Y" checked="checked"|cond="$notiConfig['MemberPush']['sendDeniedMember']">발송</label>
+
+                <label class="x_inline" for="member_push_not_use_sendDeniedMember">
+                    <input type="radio" id="member_push_not_use_sendDeniedMember" name="notiConfig[MemberPush][sendDeniedMember]" value="N" checked="checked"|cond="!$notiConfig['MemberPush']['sendDeniedMember']">발송 안 함</label>
+                <a href="#member_push_notice_sendDeniedMember" class="x_icon-question-sign" data-toggle="#member_push_notice_sendDeniedMember">{$lang->help}</a>
+                <p id="member_push_notice_sendDeniedMember" class="x_help-block" hidden="hidden">계정이 차단된 회원에게 푸시 알림을 보냅니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_title" class="x_control-label">알림 제목</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_title">
+                    <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['title']}" name="notiConfig[MemberPush][PushConfig][title]" id="member_push_title" style="width:450px;"></label>
+                <a href="#member_push_title_help" class="x_icon-question-sign" data-toggle="#noti_title_help">{$lang->help}</a>
+                <p id="member_push_title_help" class="x_help-block" hidden="hidden">알림 등록 안내 푸시에 사용될 메세지의 제목을 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_body" class="x_control-label">알림 내용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_body">
+                    <textarea name="notiConfig[MemberPush][PushConfig][body]" id="member_push_body" rows="2" style="width:450px;">{$notiConfig['MemberPush']['PushConfig']['body']}</textarea>
+                </label>
+                <a href="#member_push_body_help" class="x_icon-question-sign" data-toggle="#member_push_body_help">{$lang->help}</a>
+                <p id="member_push_body_help" class="x_help-block" hidden="hidden">초기 단말기 등록이나 기타 알림시 사용할 닉네임을 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_launch_url" class="x_control-label">이동 URL</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_launch_url">
+                    <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['launchUrl']}" name="notiConfig[MemberPush][PushConfig][launchUrl]" id="member_push_launch_url" style="width:450px;"></label>
+                <a href="#member_push_launch_url_help" class="x_icon-question-sign" data-toggle="#member_push_launch_url_help">{$lang->help}</a>
+                <p id="member_push_launch_url_help" class="x_help-block" hidden="hidden">알림 클릭시 이동할 URL을 입력합니다. URL을 입력하지 않을 경우 이동하지 않습니다</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_icon_url" class="x_control-label">알림 아이콘</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_icon_url">
+                    <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['icon']}" name="notiConfig[MemberPush][PushConfig][icon]" id="member_push_icon_url" style="width:450px;">
+                </label>
+                <a href="#member_push_icon_url_help" class="x_icon-question-sign" data-toggle="#member_push_icon_url_help">{$lang->help}</a>
+                <p id="member_push_icon_url_help" class="x_help-block" hidden="hidden">알림 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_image" class="x_control-label">알림 이미지</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_image">
+                    <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['image']}" name="notiConfig[MemberPush][PushConfig][image]" id="member_push_image" style="width:450px;"></label>
+                <a href="#member_push_image_help" class="x_icon-question-sign" data-toggle="#member_push_image_help">{$lang->help}</a>
+                <p id="member_push_image_help" class="x_help-block" hidden="hidden">알림에 사용될 2:1(가로:세로) 비율의 이미지의 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 이미지를 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_action1_id" class="x_control-label">알림 ACTION 1</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="member_push_action1_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][0][id]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 0" name="notiConfig[MemberPush][PushConfig][action1]" id="member_push_action1_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action1_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][0][title]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 0" name="notiConfig[MemberPush][PushConfig][action1_title]" id="member_push_action1_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action1_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][0][icon]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 0" name="notiConfig[MemberPush][PushConfig][action1_icon]" id="member_push_action1_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action1_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][0][launchUrl]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 0" name="notiConfig[MemberPush][PushConfig][action1_launch_url]" id="member_push_action1_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#member_push_action1_help" class="x_icon-question-sign" data-toggle="#member_push_action1_help">{$lang->help}</a>
+                <p id="member_push_action1_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_action2_id" class="x_control-label">알림 ACTION 2</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="member_push_action2_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][1][id]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 1" name="notiConfig[MemberPush][PushConfig][action2]" id="member_push_action2_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action2_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][1][title]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 1" name="notiConfig[MemberPush][PushConfig][action2_title]" id="member_push_action2_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action2_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][1][icon]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 1" name="notiConfig[MemberPush][PushConfig][action2_icon]" id="member_push_action2_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action2_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][1][launchUrl]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 1" name="notiConfig[MemberPush][PushConfig][action2_launch_url]" id="member_push_action2_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#member_push_action2_help" class="x_icon-question-sign" data-toggle="#member_push_action2_help">{$lang->help}</a>
+                <p id="member_push_action2_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_action3_id" class="x_control-label">알림 ACTION 3</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="member_push_action3_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][2][id]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 2" name="notiConfig[MemberPush][PushConfig][action3]" id="member_push_action3_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action3_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][2][title]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 2" name="notiConfig[MemberPush][PushConfig][action3_title]" id="member_push_action3_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action3_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][2][icon]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 2" name="notiConfig[MemberPush][PushConfig][action3_icon]" id="member_push_action3_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="member_push_action3_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['actions'][2][launchUrl]}"|cond="count($notiConfig['MemberPush']['PushConfig']['actions']) > 2" name="notiConfig[MemberPush][PushConfig][action3_launch_url]" id="member_push_action3_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#member_push_action3_help" class="x_icon-question-sign" data-toggle="#member_push_action3_help">{$lang->help}</a>
+                <p id="member_push_action3_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    Launch URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="member_push_badge" class="x_control-label">뱃지 아이콘 URL</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_badge">
+                    <input type="text" value="{$notiConfig['MemberPush']['PushConfig']['badge']}" name="notiConfig[MemberPush][PushConfig][badge]" id="member_push_badge" style="width:450px;"></label>
+                <a href="#member_push_badge_url_help" class="x_icon-question-sign" data-toggle="#member_push_badge_url_help">{$lang->help}</a>
+                <p id="member_push_badge_url_help" class="x_help-block" hidden="hidden">뱃지 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">고요 모드</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_use_silent">
+                    <input type="radio" id="member_push_use_silent" name="notiConfig[MemberPush][PushConfig][silent]" value="Y" checked="checked"|cond="$notiConfig['MemberPush']['PushConfig']['silent']">{$lang->use}</label>
+
+                <label class="x_inline" for="member_push_not_use_silent">
+                    <input type="radio" id="member_push_not_use_silent" name="notiConfig[MemberPush][PushConfig][silent]" value="N" checked="checked"|cond="!$notiConfig['MemberPush']['PushConfig']['silent']">{$lang->not_use}</label>
+                <a href="#member_push_silent_help" class="x_icon-question-sign" data-toggle="#member_push_silent_help">{$lang->help}</a>
+                <p id="member_push_silent_help" class="x_help-block" hidden="hidden">알림 출력시 기본으로 출력되는 소리, 진동 없이 알림 팝업만 출력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">RequireInteraction</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_use_requireinteraction">
+                    <input type="radio" id="member_push_use_requireinteraction" name="notiConfig[MemberPush][PushConfig][requireInteraction]" value="Y" checked="checked"|cond="$notiConfig['MemberPush']['PushConfig']['requireInteraction']">{$lang->use}</label>
+
+                <label class="x_inline" for="member_push_not_use_requireinteraction">
+                    <input type="radio" id="member_push_not_use_requireinteraction" name="notiConfig[MemberPush][PushConfig][requireInteraction]" value="N" checked="checked"|cond="!$notiConfig['MemberPush']['PushConfig']['requireInteraction']">{$lang->not_use}</label>
+                <a href="#member_push_silent_help" class="x_icon-question-sign" data-toggle="#member_push_requireinteraction_help">{$lang->help}</a>
+                <p id="member_push_requireinteraction_help" class="x_help-block" hidden="hidden">이 기능을 활성화할 경우 크롬 브라우저에서 알림 출력시 사용자가 마우스로 클릭하기 전까지는 알림 팝업을 닫지 않습니다.</p>
+            </div>
+        </div>
+
+
+        <div class="x_control-group">
+            <label class="x_control-label">수명 (TTL)</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_ttl">
+                    <input type="number" min="0" value="{$notiConfig['MemberPush']['PushConfig']['ttl']}" name="notiConfig[MemberPush][PushConfig][ttl]" id="member_push_ttl" style="width:100px;"></label>
+
+                <a href="#member_push_ttl_help" class="x_icon-question-sign" data-toggle="#member_push_ttl_help">{$lang->help}</a>
+                <p id="member_push_ttl_help" class="x_help-block" hidden="hidden">메세지 수명을 설정합니다. 단위 : 초, 기본값 : 2주</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">알림 우선순위</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_urgency_very-low">
+                    <input type="radio" id="member_push_urgency_very-low" name="notiConfig[MemberPush][PushConfig][urgency]" value="very-low" checked="checked"|cond="$notiConfig['MemberPush']['PushConfig']['urgency'] === 'very-low'">매우 낮음</label>
+
+                <label class="x_inline" for="member_push_urgency_low">
+                    <input type="radio" id="member_push_urgency_low" name="notiConfig[MemberPush][PushConfig][urgency]" value="low" checked="checked"|cond="$notiConfig['MemberPush']['PushConfig']['urgency'] === 'low'">낮음</label>
+
+                <label class="x_inline" for="member_push_urgency_normal">
+                    <input type="radio" id="member_push_urgency_normal" name="notiConfig[MemberPush][PushConfig][urgency]" value="normal" checked="checked"|cond="$notiConfig['MemberPush']['PushConfig']['urgency'] === 'normal'">보통</label>
+
+                <label class="x_inline" for="member_push_urgency_high">
+                    <input type="radio" id="member_push_urgency_high" name="notiConfig[MemberPush][PushConfig][urgency]" value="high" checked="checked"|cond="$notiConfig['MemberPush']['PushConfig']['urgency'] === 'high'">높음</label>
+
+                <a href="#member_push_urgency_help" class="x_icon-question-sign" data-toggle="#member_push_urgency_help">{$lang->help}</a>
+                <p id="member_push_urgency_help" class="x_help-block" hidden="hidden">알림의 우선순위를 정합니다. 기본값 : normal<BR><BR>
+                매우 낮음 : 전원(충전)이 공급중이고 와이파이 수신중일때 (광고)<BR>
+                    낮음 : 전원이 공급중이거나 와이파이가 연결되었을때 (공지)<BR>
+                    보통 : 전원, 와이파이 둘 다 사용중이지 않을때 (채팅)<BR>
+                    높음 : 잔여 배터리가 부족할때 (전화, 중요하거나 급한 공지)
+                </p>
+            </div>
+        </div>
+
+
+        <div class="x_control-group">
+            <label for="member_push_group_srl" class="x_control-label">푸시 그룹</label>
+            <div class="x_controls">
+
+                <select name="notiConfig[MemberPush][PushConfig][pushGroupSrl]" id="member_push_group_srl">
+                    <option loop="$pushGroupList => $key, $val" value="{$val['push_group_srl']}" selected|cond="$notiConfig['MemberPush']['PushConfig']['pushGroupSrl'] == $val['push_group_srl']">{$val['name']}</option>
+                </select>
+
+                <a href="#member_push_group_srl_help" class="x_icon-question-sign" data-toggle="#member_push_group_srl_help">{$lang->help}</a>
+                <p id="member_push_group_srl_help" class="x_help-block" hidden="hidden">푸시 알림의 그룹을 설정합니다. 같은 그룹의 알림을 한 개의 알림으로 묶어 처리합니다.</p>
+            </div>
+        </div>
+
+    </section>
+
+    <section class="section">
+        <h1>비회원 푸시<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+        <div class="x_control-group">
+            <label class="x_control-label">비회원 푸시 등록 허용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_allow_insert">
+                    <input type="radio" id="guest_push_allow_insert" name="notiConfig[GuestPush][allowInsert]" value="Y" checked="checked"|cond="$notiConfig['GuestPush']['allowInsert']">{$lang->use}</label>
+
+                <label class="x_inline" for="guest_push_not_allow_insert">
+                    <input type="radio" id="guest_push_not_allow_insert" name="notiConfig[GuestPush][allowInsert]" value="N" checked="checked"|cond="!$notiConfig['GuestPush']['allowInsert']">{$lang->not_use}</label>
+                <a href="#guest_allow_insert_help" class="x_icon-question-sign" data-toggle="#guest_allow_insert_help">{$lang->help}</a>
+                <p id="guest_allow_insert_help" class="x_help-block" hidden="hidden">비회원이 푸시 등록을 할 수 있도록 합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">알림 등록 안내 푸시</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_use_notice">
+                    <input type="radio" id="guest_push_use_notice" name="notiConfig[GuestPush][sendInsertNotice]" value="Y" checked="checked"|cond="$notiConfig['GuestPush']['sendInsertNotice']">{$lang->use}</label>
+
+                <label class="x_inline" for="guest_push_not_use_notice">
+                    <input type="radio" id="guest_push_not_use_notice" name="notiConfig[GuestPush][sendInsertNotice]" value="N" checked="checked"|cond="!$notiConfig['GuestPush']['sendInsertNotice']">{$lang->not_use}</label>
+                <a href="#guest_push_notice_help" class="x_icon-question-sign" data-toggle="#guest_push_notice_help">{$lang->help}</a>
+                <p id="guest_push_notice_help" class="x_help-block" hidden="hidden">회원이 푸시 등록에 성공할 경우 푸시 알림이 등록된 단말기로 안내 메세지를 보냅니다.</p>
+            </div>
+        </div>
+
+
+        <div class="x_control-group">
+            <label for="guest_push_title" class="x_control-label">알림 제목</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_title">
+                    <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['title']}" name="notiConfig[GuestPush][PushConfig][title]" id="guest_push_title" style="width:450px;"></label>
+                <a href="#guest_push_title_help" class="x_icon-question-sign" data-toggle="#noti_title_help">{$lang->help}</a>
+                <p id="guest_push_title_help" class="x_help-block" hidden="hidden">알림 등록 안내 푸시에 사용될 메세지의 제목을 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_body" class="x_control-label">알림 내용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_body">
+                    <textarea name="notiConfig[GuestPush][PushConfig][body]" id="guest_push_body" rows="2" style="width:450px;">{$notiConfig['GuestPush']['PushConfig']['body']}</textarea>
+                </label>
+                <a href="#guest_push_body_help" class="x_icon-question-sign" data-toggle="#guest_push_body_help">{$lang->help}</a>
+                <p id="guest_push_body_help" class="x_help-block" hidden="hidden">초기 단말기 등록이나 기타 알림시 사용할 닉네임을 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_launch_url" class="x_control-label">이동 URL</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_launch_url">
+                    <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['launchUrl']}" name="notiConfig[GuestPush][PushConfig][launchUrl]" id="guest_push_launch_url" style="width:450px;"></label>
+                <a href="#guest_push_launch_url_help" class="x_icon-question-sign" data-toggle="#guest_push_launch_url_help">{$lang->help}</a>
+                <p id="guest_push_launch_url_help" class="x_help-block" hidden="hidden">알림 클릭시 이동할 URL을 입력합니다. URL을 입력하지 않을 경우 이동하지 않습니다</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_icon_url" class="x_control-label">알림 아이콘</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_icon_url">
+                    <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['icon']}" name="notiConfig[GuestPush][PushConfig][icon]" id="guest_push_icon_url" style="width:450px;"></label>
+                <a href="#guest_push_icon_url_help" class="x_icon-question-sign" data-toggle="#guest_push_icon_url_help">{$lang->help}</a>
+                <p id="guest_push_icon_url_help" class="x_help-block" hidden="hidden">알림 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_image" class="x_control-label">알림 이미지</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_image">
+                    <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['image']}" name="notiConfig[GuestPush][PushConfig][image]" id="guest_push_image" style="width:450px;"></label>
+                <a href="#guest_push_image_help" class="x_icon-question-sign" data-toggle="#guest_push_image_help">{$lang->help}</a>
+                <p id="guest_push_image_help" class="x_help-block" hidden="hidden">알림에 사용될 2:1(가로:세로) 비율의 이미지의 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 이미지를 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_action1_id" class="x_control-label">알림 ACTION 1</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="guest_push_action1_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][0][action]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 0" name="notiConfig[GuestPush][PushConfig][action1]" id="guest_push_action1_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action1_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][0][title]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 0" name="notiConfig[GuestPush][PushConfig][action1_title]" id="guest_push_action1_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action1_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][0][icon]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 0" name="notiConfig[GuestPush][PushConfig][action1_icon]" id="guest_push_action1_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action1_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][0][launchUrl]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 0" name="notiConfig[GuestPush][PushConfig][action1_launch_url]" id="guest_push_action1_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#guest_push_action1_help" class="x_icon-question-sign" data-toggle="#guest_push_action1_help">{$lang->help}</a>
+                <p id="guest_push_action1_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_action2_id" class="x_control-label">알림 ACTION 2</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="guest_push_action2_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][1][action]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 1" name="notiConfig[GuestPush][PushConfig][action2]" id="guest_push_action2_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action2_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][1][title]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 1" name="notiConfig[GuestPush][PushConfig][action2_title]" id="guest_push_action2_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action2_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][1][icon]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 1" name="notiConfig[GuestPush][PushConfig][action2_icon]" id="guest_push_action2_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action2_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][1][launchUrl]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 1" name="notiConfig[GuestPush][PushConfig][action2_launch_url]" id="guest_push_action2_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#guest_push_action2_help" class="x_icon-question-sign" data-toggle="#guest_push_action2_help">{$lang->help}</a>
+                <p id="guest_push_action2_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_action3_id" class="x_control-label">알림 ACTION 3</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="guest_push_action3_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][2][action]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 2" name="notiConfig[GuestPush][PushConfig][action3]" id="guest_push_action3_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action3_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][2][title]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 2" name="notiConfig[GuestPush][PushConfig][action3_title]" id="guest_push_action3_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action3_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][2][icon]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 2" name="notiConfig[GuestPush][PushConfig][action3_icon]" id="guest_push_action3_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="guest_push_action3_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['actions'][2][launchUrl]}"|cond="count($notiConfig['GuestPush']['PushConfig']['actions']) > 2" name="notiConfig[GuestPush][PushConfig][action3_launch_url]" id="guest_push_action3_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#guest_push_action3_help" class="x_icon-question-sign" data-toggle="#guest_push_action3_help">{$lang->help}</a>
+                <p id="guest_push_action3_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    Launch URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_badge" class="x_control-label">뱃지 아이콘 URL</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_badge">
+                    <input type="text" value="{$notiConfig['GuestPush']['PushConfig']['badge']}" name="notiConfig[GuestPush][PushConfig][badge]" id="guest_push_badge" style="width:450px;"></label>
+                <a href="#guest_push_badge_url_help" class="x_icon-question-sign" data-toggle="#guest_push_badge_url_help">{$lang->help}</a>
+                <p id="guest_push_badge_url_help" class="x_help-block" hidden="hidden">뱃지 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">고요 모드</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_use_silent">
+                    <input type="radio" id="guest_push_use_silent" name="notiConfig[GuestPush][PushConfig][silent]" value="Y" checked="checked"|cond="$notiConfig['GuestPush']['PushConfig']['silent']">{$lang->use}</label>
+
+                <label class="x_inline" for="guest_push_not_use_silent">
+                    <input type="radio" id="guest_push_not_use_silent" name="notiConfig[GuestPush][PushConfig][silent]" value="N" checked="checked"|cond="!$notiConfig['GuestPush']['PushConfig']['silent']">{$lang->not_use}</label>
+                <a href="#guest_push_silent_help" class="x_icon-question-sign" data-toggle="#guest_push_silent_help">{$lang->help}</a>
+                <p id="guest_push_silent_help" class="x_help-block" hidden="hidden">알림 출력시 기본으로 출력되는 소리, 진동 없이 알림 팝업만 출력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">RequireInteraction</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_use_requireinteraction">
+                    <input type="radio" id="guest_push_use_requireinteraction" name="notiConfig[GuestPush][PushConfig][requireInteraction]" value="Y" checked="checked"|cond="$notiConfig['GuestPush']['PushConfig']['requireInteraction']">{$lang->use}</label>
+
+                <label class="x_inline" for="guest_push_not_use_requireinteraction">
+                    <input type="radio" id="guest_push_not_use_requireinteraction" name="notiConfig[GuestPush][PushConfig][requireInteraction]" value="N" checked="checked"|cond="!$notiConfig['GuestPush']['PushConfig']['requireInteraction']">{$lang->not_use}</label>
+                <a href="#guest_push_silent_help" class="x_icon-question-sign" data-toggle="#guest_push_requireinteraction_help">{$lang->help}</a>
+                <p id="guest_push_requireinteraction_help" class="x_help-block" hidden="hidden">이 기능을 활성화할 경우 크롬 브라우저에서 알림 출력시 사용자가 마우스로 클릭하기 전까지는 알림 팝업을 닫지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">재알림</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_use_renotify">
+                    <input type="radio" id="guest_push_use_renotify" name="notiConfig[GuestPush][PushConfig][renotify]" value="Y" checked="checked"|cond="$notiConfig['GuestPush']['PushConfig']['renotify']">{$lang->use}</label>
+
+                <label class="x_inline" for="guest_push_not_use_renotify">
+                    <input type="radio" id="guest_push_not_use_renotify" name="notiConfig[GuestPush][PushConfig][renotify]" value="N" checked="checked"|cond="!$notiConfig['GuestPush']['PushConfig']['renotify']">{$lang->not_use}</label>
+                <a href="#guest_push_renotify_help" class="x_icon-question-sign" data-toggle="#guest_push_renotify_help">{$lang->help}</a>
+                <p id="guest_push_renotify_help" class="x_help-block" hidden="hidden">이 기능을 활성화할 경우 크롬 브라우저에서 이미 출력중인 알림이 있더라도 새로운 알림을 강제로 출력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">수명 (TTL)</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_ttl">
+                    <input type="number" min="0" value="{$notiConfig['GuestPush']['PushConfig']['ttl']}" name="notiConfig[GuestPush][PushConfig][ttl]" id="guest_push_ttl" style="width:100px;"></label>
+
+                <a href="#guest_push_ttl_help" class="x_icon-question-sign" data-toggle="#guest_push_ttl_help">{$lang->help}</a>
+                <p id="guest_push_ttl_help" class="x_help-block" hidden="hidden">메세지 수명을 설정합니다. 단위 : 초, 기본값 : 2주</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">알림 우선순위</label>
+            <div class="x_controls">
+                <label class="x_inline" for="guest_push_urgency_very-low">
+                    <input type="radio" id="guest_push_urgency_very-low" name="notiConfig[GuestPush][PushConfig][urgency]" value="very-low" checked="checked"|cond="$notiConfig['GuestPush']['PushConfig']['urgency'] === 'very-low'">매우 낮음</label>
+
+                <label class="x_inline" for="guest_push_urgency_low">
+                    <input type="radio" id="guest_push_urgency_low" name="notiConfig[GuestPush][PushConfig][urgency]" value="low" checked="checked"|cond="$notiConfig['GuestPush']['PushConfig']['urgency'] === 'low'">낮음</label>
+
+                <label class="x_inline" for="guest_push_urgency_normal">
+                    <input type="radio" id="guest_push_urgency_normal" name="notiConfig[GuestPush][PushConfig][urgency]" value="normal" checked="checked"|cond="$notiConfig['GuestPush']['PushConfig']['urgency'] === 'normal'">보통</label>
+
+                <label class="x_inline" for="guest_push_urgency_high">
+                    <input type="radio" id="guest_push_urgency_high" name="notiConfig[GuestPush][PushConfig][urgency]" value="high" checked="checked"|cond="$notiConfig['GuestPush']['PushConfig']['urgency'] === 'high'">높음</label>
+
+                <a href="#guest_push_urgency_help" class="x_icon-question-sign" data-toggle="#guest_push_urgency_help">{$lang->help}</a>
+                <p id="guest_push_urgency_help" class="x_help-block" hidden="hidden">알림의 우선순위를 정합니다. 기본값 : normal<BR><BR>
+                    매우 낮음 : 전원(충전)이 공급중이고 와이파이 수신중일때 (광고)<BR>
+                    낮음 : 전원이 공급중이거나 와이파이가 연결되었을때 (공지)<BR>
+                    보통 : 전원, 와이파이 둘 다 사용중이지 않을때 (채팅)<BR>
+                    높음 : 잔여 배터리가 부족할때 (전화, 중요하거나 급한 공지)</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="guest_push_group_srl" class="x_control-label">푸시 그룹</label>
+            <div class="x_controls">
+
+                <select name="notiConfig[GuestPush][PushConfig][pushGroupSrl]" id="guest_push_group_srl">
+                    <option loop="$pushGroupList => $key, $val" value="{$val['push_group_srl']}" selected|cond="$notiConfig['GuestPush']['PushConfig']['pushGroupSrl'] == $val['push_group_srl']">{$val['name']}</option>
+                </select>
+
+                <a href="#guest_push_group_srl_help" class="x_icon-question-sign" data-toggle="#guest_push_group_srl_help">{$lang->help}</a>
+                <p id="guest_push_group_srl_help" class="x_help-block" hidden="hidden">푸시 알림의 그룹을 설정합니다. 같은 그룹의 알림을 한 개의 알림으로 묶어 처리합니다.</p>
+            </div>
+        </div>
+
+    </section>
+
+
+
+    <section class="section">
+        <h1>미등록 알림<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+        <div class="x_control-group">
+            <label for="unknown_push_title" class="x_control-label">알림 제목</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_title">
+                    <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['title']}" name="notiConfig[UnknownPush][PushConfig][title]" id="unknown_push_title" style="width:450px;"></label>
+                <a href="#unknown_push_title_help" class="x_icon-question-sign" data-toggle="#unknown_title_help">{$lang->help}</a>
+                <p id="unknown_push_title_help" class="x_help-block" hidden="hidden">알림 등록 안내 푸시에 사용될 메세지의 제목을 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_body" class="x_control-label">알림 내용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_body">
+                    <textarea name="notiConfig[UnknownPush][PushConfig][body]" id="unknown_push_body" rows="2" style="width:450px;">{$notiConfig['UnknownPush']['PushConfig']['body']}</textarea>
+                </label>
+                <a href="#unknown_push_body_help" class="x_icon-question-sign" data-toggle="#unknown_push_body_help">{$lang->help}</a>
+                <p id="unknown_push_body_help" class="x_help-block" hidden="hidden">초기 단말기 등록이나 기타 알림시 사용할 닉네임을 입력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_launch_url" class="x_control-label">이동 URL</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_launch_url">
+                    <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['launchUrl']}" name="notiConfig[UnknownPush][PushConfig][launchUrl]" id="unknown_push_launch_url" style="width:450px;"></label>
+                <a href="#unknown_push_launch_url_help" class="x_icon-question-sign" data-toggle="#unknown_push_launch_url_help">{$lang->help}</a>
+                <p id="unknown_push_launch_url_help" class="x_help-block" hidden="hidden">알림 클릭시 이동할 URL을 입력합니다. URL을 입력하지 않을 경우 이동하지 않습니다</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_icon_url" class="x_control-label">알림 아이콘</label>
+            <div class="x_controls">
+                <label class="x_inline" for="member_push_icon_url">
+                    <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['icon']}" name="notiConfig[UnknownPush][PushConfig][icon]" id="unknown_push_icon_url" style="width:450px;"></label>
+                <a href="#unknown_push_icon_url_help" class="x_icon-question-sign" data-toggle="#unknown_push_icon_url_help">{$lang->help}</a>
+                <p id="unknown_push_icon_url_help" class="x_help-block" hidden="hidden">알림 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_image" class="x_control-label">알림 이미지</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_image">
+                    <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['image']}" name="notiConfig[UnknownPush][PushConfig][image]" id="unknown_push_image" style="width:450px;"></label>
+                <a href="#unknown_push_image_help" class="x_icon-question-sign" data-toggle="#unknown_push_image_help">{$lang->help}</a>
+                <p id="unknown_push_image_help" class="x_help-block" hidden="hidden">알림에 사용될 2:1(가로:세로) 비율의 이미지의 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 이미지를 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_action1_id" class="x_control-label">알림 ACTION 1</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="unknown_push_action1_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][0][action]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 0" name="notiConfig[UnknownPush][PushConfig][action1]" id="unknown_push_action1_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action1_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][0][title]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 0" name="notiConfig[UnknownPush][PushConfig][action1_title]" id="unknown_push_action1_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action1_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][0][icon]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 0" name="notiConfig[UnknownPush][PushConfig][action1_icon]" id="unknown_push_action1_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action1_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][0][launchUrl]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 0" name="notiConfig[UnknownPush][PushConfig][action1_launch_url]" id="unknown_push_action1_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#unknown_push_action1_help" class="x_icon-question-sign" data-toggle="#unknown_push_action1_help">{$lang->help}</a>
+                <p id="unknown_push_action1_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_action2_id" class="x_control-label">알림 ACTION 2</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="unknown_push_action2_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][1][action]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 1" name="notiConfig[UnknownPush][PushConfig][action2]" id="unknown_push_action2_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action2_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][1][title]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 1" name="notiConfig[UnknownPush][PushConfig][action2_title]" id="unknown_push_action2_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action2_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][1][icon]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 1" name="notiConfig[UnknownPush][PushConfig][action2_icon]" id="unknown_push_action2_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action2_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][1][launchUrl]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 1" name="notiConfig[UnknownPush][PushConfig][action2_launch_url]" id="unknown_push_action2_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#unknown_push_action2_help" class="x_icon-question-sign" data-toggle="#unknown_push_action2_help">{$lang->help}</a>
+                <p id="unknown_push_action2_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    LAUNCH URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_action3_id" class="x_control-label">알림 ACTION 3</label>
+            <div class="x_controls">
+                <div>
+                    <label class="x_inline" for="unknown_push_action3_id">
+                        <span style="display: inline-block; width: 100px;">ACTION ID</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][2][action]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 2" name="notiConfig[UnknownPush][PushConfig][action3]" id="unknown_push_action3_id" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action3_title">
+                        <span style="display: inline-block; width: 100px;">BUTTON TEXT</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][2][title]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 2" name="notiConfig[UnknownPush][PushConfig][action3_title]" id="unknown_push_action3_title" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action3_icon">
+                        <span style="display: inline-block; width: 100px;">ICON URL</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][2][icon]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 2" name="notiConfig[UnknownPush][PushConfig][action3_icon]" id="unknown_push_action3_icon" style="width:350px;">
+                    </label>
+                </div>
+                <div>
+                    <label class="x_inline" for="unknown_push_action3_launch_url">
+                        <span style="display: inline-block; width: 100px;">LAUNCH URL</span>
+                        <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['actions'][2][launchUrl]}"|cond="count($notiConfig['UnknownPush']['PushConfig']['actions']) > 2" name="notiConfig[UnknownPush][PushConfig][action3_launch_url]" id="unknown_push_action3_launch_url" style="width:350px;">
+                    </label>
+                </div>
+
+                <a href="#unknown_push_action3_help" class="x_icon-question-sign" data-toggle="#unknown_push_action3_help">{$lang->help}</a>
+                <p id="unknown_push_action3_help" class="x_help-block" hidden="hidden">
+                    크롬 알림에 출력할 추가 버튼을 설정합니다. 값을 비워놓을 경우 적용되지 않습니다.<br>
+                    Action : 알림에서 사용할 버튼의 고유 ID를 정합니다. (예: push_btn_1) <br>
+                    Button text : 버튼에 출력될 내용을 입력합니다 (예: 닫기, 자세히 확인하기) <br>
+                    Icon URL : 버튼 아이콘에 사용될 URL(jpg, png)을 입력합니다. 공백으로 놔둘 경우 아이콘을 출력하지 않습니다. <br>
+                    Launch URL : 버튼 클릭시 이동할 URL을 입력합니다. 입력하지 않을 경우 URL을 이동하지 않고 해당 알림만 닫습니다.
+                </p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_badge" class="x_control-label">뱃지 아이콘 URL</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_badge">
+                    <input type="text" value="{$notiConfig['UnknownPush']['PushConfig']['badge']}" name="notiConfig[UnknownPush][PushConfig][badge]" id="unknown_push_badge" style="width:450px;"></label>
+                <a href="#unknown_push_badge_url_help" class="x_icon-question-sign" data-toggle="#unknown_push_badge_url_help">{$lang->help}</a>
+                <p id="unknown_push_badge_url_help" class="x_help-block" hidden="hidden">뱃지 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">고요 모드</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_use_silent">
+                    <input type="radio" id="unknown_push_use_silent" name="notiConfig[UnknownPush][PushConfig][silent]" value="Y" checked="checked"|cond="$notiConfig['UnknownPush']['PushConfig']['silent']">{$lang->use}</label>
+
+                <label class="x_inline" for="unknown_push_not_use_silent">
+                    <input type="radio" id="unknown_push_not_use_silent" name="notiConfig[UnknownPush][PushConfig][silent]" value="N" checked="checked"|cond="!$notiConfig['UnknownPush']['PushConfig']['silent']">{$lang->not_use}</label>
+                <a href="#unknown_push_silent_help" class="x_icon-question-sign" data-toggle="#unknown_push_silent_help">{$lang->help}</a>
+                <p id="unknown_push_silent_help" class="x_help-block" hidden="hidden">알림 출력시 기본으로 출력되는 소리, 진동 없이 알림 팝업만 출력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">RequireInteraction</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_use_requireinteraction">
+                    <input type="radio" id="unknown_push_use_requireinteraction" name="notiConfig[UnknownPush][PushConfig][requireInteraction]" value="Y" checked="checked"|cond="$notiConfig['UnknownPush']['PushConfig']['requireInteraction']">{$lang->use}</label>
+
+                <label class="x_inline" for="unknown_push_not_use_requireinteraction">
+                    <input type="radio" id="unknown_push_not_use_requireinteraction" name="notiConfig[UnknownPush][PushConfig][requireInteraction]" value="N" checked="checked"|cond="!$notiConfig['UnknownPush']['PushConfig']['requireInteraction']">{$lang->not_use}</label>
+                <a href="#unknown_push_silent_help" class="x_icon-question-sign" data-toggle="#unknown_push_requireinteraction_help">{$lang->help}</a>
+                <p id="unknown_push_requireinteraction_help" class="x_help-block" hidden="hidden">이 기능을 활성화할 경우 크롬 브라우저에서 알림 출력시 사용자가 마우스로 클릭하기 전까지는 알림 팝업을 닫지 않습니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">재알림</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_use_renotify">
+                    <input type="radio" id="unknown_push_use_renotify" name="notiConfig[UnknownPush][PushConfig][renotify]" value="Y" checked="checked"|cond="$notiConfig['UnknownPush']['PushConfig']['renotify']">{$lang->use}</label>
+
+                <label class="x_inline" for="unknown_push_not_use_renotify">
+                    <input type="radio" id="unknown_push_not_use_renotify" name="notiConfig[UnknownPush][PushConfig][renotify]" value="N" checked="checked"|cond="!$notiConfig['UnknownPush']['PushConfig']['renotify']">{$lang->not_use}</label>
+                <a href="#unknown_push_renotify_help" class="x_icon-question-sign" data-toggle="#unknown_push_renotify_help">{$lang->help}</a>
+                <p id="unknown_push_renotify_help" class="x_help-block" hidden="hidden">이 기능을 활성화할 경우 크롬 브라우저에서 이미 출력중인 알림이 있더라도 새로운 알림을 강제로 출력합니다.</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">수명 (TTL)</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_ttl">
+                    <input type="number" min="0" value="{$notiConfig['UnknownPush']['PushConfig']['ttl']}" name="notiConfig[UnknownPush][PushConfig][ttl]" id="unknown_push_ttl" style="width:100px;"></label>
+
+                <a href="#unknown_push_ttl_help" class="x_icon-question-sign" data-toggle="#unknown_push_ttl_help">{$lang->help}</a>
+                <p id="unknown_push_ttl_help" class="x_help-block" hidden="hidden">메세지 수명을 설정합니다. 단위 : 초, 기본값 : 2주</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">알림 우선순위</label>
+            <div class="x_controls">
+                <label class="x_inline" for="unknown_push_urgency_very-low">
+                    <input type="radio" id="unknown_push_urgency_very-low" name="notiConfig[UnknownPush][PushConfig][urgency]" value="very-low" checked="checked"|cond="$notiConfig['UnknownPush']['PushConfig']['urgency'] === 'very-low'">매우 낮음</label>
+
+                <label class="x_inline" for="unknown_push_urgency_low">
+                    <input type="radio" id="unknown_push_urgency_low" name="notiConfig[UnknownPush][PushConfig][urgency]" value="low" checked="checked"|cond="$notiConfig['UnknownPush']['PushConfig']['urgency'] === 'low'">낮음</label>
+
+                <label class="x_inline" for="unknown_push_urgency_normal">
+                    <input type="radio" id="unknown_push_urgency_normal" name="notiConfig[UnknownPush][PushConfig][urgency]" value="normal" checked="checked"|cond="$notiConfig['UnknownPush']['PushConfig']['urgency'] === 'normal'">보통</label>
+
+                <label class="x_inline" for="unknown_push_urgency_high">
+                    <input type="radio" id="unknown_push_urgency_high" name="notiConfig[UnknownPush][PushConfig][urgency]" value="high" checked="checked"|cond="$notiConfig['UnknownPush']['PushConfig']['urgency'] === 'high'">높음</label>
+
+                <a href="#unknown_push_urgency_help" class="x_icon-question-sign" data-toggle="#unknown_push_urgency_help">{$lang->help}</a>
+                <p id="unknown_push_urgency_help" class="x_help-block" hidden="hidden">알림의 우선순위를 정합니다. 기본값 : normal<BR><BR>
+                    매우 낮음 : 전원(충전)이 공급중이고 와이파이 수신중일때 (광고)<BR>
+                    낮음 : 전원이 공급중이거나 와이파이가 연결되었을때 (공지)<BR>
+                    보통 : 전원, 와이파이 둘 다 사용중이지 않을때 (채팅)<BR>
+                    높음 : 잔여 배터리가 부족할때 (전화, 중요하거나 급한 공지)</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label for="unknown_push_group_srl" class="x_control-label">푸시 그룹</label>
+            <div class="x_controls">
+
+                <select name="notiConfig[UnknownPush][PushConfig][pushGroupSrl]" id="unknown_push_group_srl">
+                    <option loop="$pushGroupList => $key, $val" value="{$val['push_group_srl']}" selected|cond="$notiConfig['UnknownPush']['PushConfig']['pushGroupSrl'] == $val['push_group_srl']">{$val['name']}</option>
+                </select>
+
+                <a href="#unknown_push_group_srl_help" class="x_icon-question-sign" data-toggle="#unknown_push_group_srl_help">{$lang->help}</a>
+                <p id="unknown_push_group_srl_help" class="x_help-block" hidden="hidden">푸시 알림의 그룹을 설정합니다. 같은 그룹의 알림을 한 개의 알림으로 묶어 처리합니다.</p>
+            </div>
+        </div>
+
+    </section>
+
+
+
+
+    <section class="section">
+        <h1>기타<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+
+
+        <div class="x_control-group">
+            <label class="x_control-label">로그인 사용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="use_tryinsertIfLogin">
+                    <input type="radio" id="use_tryinsertIfLogin" name="notiConfig[tryinsertIfLogin]" value="Y" checked="checked"|cond="$notiConfig['tryinsertIfLogin']">{$lang->use}</label>
+
+                <label class="x_inline" for="not_use_tryinsertIfLogin">
+                    <input type="radio" id="not_use_tryinsertIfLogin" name="notiConfig[tryinsertIfLogin]" value="N" checked="checked"|cond="!$notiConfig['tryinsertIfLogin']">{$lang->not_use}</label>
+                <a href="#tryinsertIfLogin_help" class="x_icon-question-sign" data-toggle="#tryinsertIfLogin_help">{$lang->help}</a>
+                <p id="tryinsertIfLogin_help" class="x_help-block" hidden="hidden">로그인을 하였을 경우 푸시알림 활성화를 유도합니다. 기본값: 사용 안 함</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">자동로그인 사용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="use_tryinsertIfAutologin">
+                    <input type="radio" id="use_tryinsertIfAutologin" name="notiConfig[tryinsertIfAutologin]" value="Y" checked="checked"|cond="$notiConfig['tryinsertIfAutologin']">{$lang->use}</label>
+
+                <label class="x_inline" for="not_use_tryinsertIfAutologin">
+                    <input type="radio" id="not_use_tryinsertIfAutologin" name="notiConfig[tryinsertIfAutologin]" value="N" checked="checked"|cond="!$notiConfig['tryinsertIfAutologin']">{$lang->not_use}</label>
+                <a href="#tryinsertIfAutologin_help" class="x_icon-question-sign" data-toggle="#tryinsertIfAutologin_help">{$lang->help}</a>
+                <p id="tryinsertIfAutologin_help" class="x_help-block" hidden="hidden">자동로그인을 이용하여 로그인하였을 경우 푸시알림 활성화를 유도합니다. 기본값: 사용 안 함</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">[DEBUG] 디버깅 페이지 사용</label>
+            <div class="x_controls">
+                <label class="x_inline" for="use_debugpage">
+                    <input type="radio" id="use_debugpage" name="notiConfig[allowDebugPage]" value="Y" checked="checked"|cond="$notiConfig['allowDebugPage']">{$lang->use}</label>
+
+                <label class="x_inline" for="not_use_debugpage">
+                    <input type="radio" id="not_use_debugpage" name="notiConfig[allowDebugPage]" value="N" checked="checked"|cond="!$notiConfig['allowDebugPage']">{$lang->not_use}</label>
+                <a href="#debugpage_help" class="x_icon-question-sign" data-toggle="#debugpage_help">{$lang->help}</a>
+                <p id="debugpage_help" class="x_help-block" hidden="hidden">자동로그인을 이용하여 로그인하였을 경우 푸시알림 활성화를 유도합니다. 기본값: 사용 안 함</p>
+            </div>
+        </div>
+
+        <div class="x_control-group">
+            <label class="x_control-label">[DEBUG] 클라이언트 이벤트 수신 거부</label>
+            <div class="x_controls">
+                <label class="x_inline" for="use_event_passthrough">
+                    <input type="radio" id="use_event_passthrough" name="notiConfig[pushEventPassThrough]" value="Y" checked="checked"|cond="$notiConfig['pushEventPassThrough']">수신 거부</label>
+
+                <label class="x_inline" for="not_use_event_passthrough">
+                    <input type="radio" id="not_use_event_passthrough" name="notiConfig[pushEventPassThrough]" value="N" checked="checked"|cond="!$notiConfig['pushEventPassThrough']">수신 허용</label>
+                <a href="#event_passthrough_help" class="x_icon-question-sign" data-toggle="#event_passthrough_help">{$lang->help}</a>
+                <p id="event_passthrough_help" class="x_help-block" hidden="hidden">클라이언트 알림의 push, click, close 이벤트에 대해 추적하지 않습니다. 기본값: 수신 허용</p>
+            </div>
+        </div>
+
+
+    </section>
+
+
+    <div class="x_clearfix btnArea">
+        <span class="x_pull-right"><input class="x_btn x_btn-primary" type="submit" value="{$lang->cmd_save}"></span>
+    </div>
+</form>
+
+
+
+<script>
+
+
+
+
+    (function($) {
+
+        $(document).on('click', 'a.notiMessageQueueTest', function () {
+            window.exec_json('noti.procNotiAdminMessageQueueServerTest', {mid: 'admin'}, function (resp) {
+                if (resp.diagnosisMessage) {
+                    alert("연결 실패 : \r\n" + resp.diagnosisMessage);
+                } else {
+                    alert("연결 성공. \r\n연결 시간 : " + resp.executeTime);
+                }
+            });
+        });
+
+        $(document).on('click', 'a.notiPurgeQueue', function() {
+            window.exec_json('noti.procNotiAdminMessageQueuePurge', {}, function() {
+                alert("퍼지 요청을 보냈습니다.");
+            });
+        });
+
+        $(document).on('click', 'a.notiExitNodeServer', function() {
+            var msg = window.confirm("정말로 node서버 중지요청을 하시겠습니까? \n기존에 처리중인 푸시 작업이 손실될 수 있습니다.");
+            if(msg) {
+                window.exec_json('noti.procNotiAdminNodeExitRequest', {}, function() {
+                    alert("node서버 중지를 요청하였습니다.<BR>\nnode서버를 재시작 하기 전에 반드시 큐 퍼지기능을 사용해주세요.");
+                });
+            }
+
+        });
+
+    })(window.jQuery);
+
+</script>

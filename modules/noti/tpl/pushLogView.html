@@ -1,0 +1,537 @@
+<!--// HEADER -->
+
+
+<load target="js/adminPushLogView.js" />
+<include target="_header.html" />
+
+
+<style>
+
+    .resend-push-status dl {display: inline-block;}
+    .resend-push-status dt {display: inline-block;}
+    .resend-push-status dd {display: inline-block; margin: 0 0 0 10px;}
+    .resend-push-cancel {margin: 0 0 0 20px;}
+
+</style>
+
+<h2>알림 상세정보</h2>
+
+<table cond="$pushData" class="x_table x_table-striped x_table-hover">
+    <colgroup>
+        <col width="120">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th scope="col" class="nowr">푸시 ID</th>
+        <td>
+            {$pushData->push_srl}
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">단말기 ID</th>
+        <td>
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target','endpoint_srl', 'search_keyword', $pushData->endpoint_srl)}">
+            {$pushData->endpoint_srl}
+            </a>
+
+            <!--@if($endpointData)-->
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminEndpointView', 'endpoint_srl', $pushData->endpoint_srl)}" target="_blank">(자세히 보기)</a>
+            <!--@else-->
+            (삭제되었거나 존재하지 않는 단말기)
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">단말기 플랫폼 / 브라우저</th>
+        <td>
+            <!--@if($endpointData)-->
+            {$endpointData->platform} / {$endpointData->browser}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">수신자 닉네임</th>
+        <td>
+            <!--@if($pushData->member_srl <= 0) -->
+                {$pushData->nick_name}
+            <!--@else-->
+                <a href="#popup_menu_area" class="member_{$pushData->member_srl}" onclick="return false">{$pushData->nick_name}</a>
+
+                <!--@if($pushMemberInfo)-->
+                <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target','member_srl', 'search_keyword', $pushData->member_srl)}">
+                    [{$pushMemberInfo->user_id}]
+                </a>
+                <!--@else-->
+                (탈퇴한 회원)
+                <!--@end-->
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">발신자 닉네임</th>
+        <td>
+            <!--@if($pushData->sender_member_srl <= 0) -->
+            {$pushData->sender_nick_name}
+            <!--@else-->
+                <a href="#popup_menu_area" class="member_{$pushData->sender_member_srl}" onclick="return false">{$pushData->sender_nick_name}</a>
+                <!--@if($pushSenderMemberInfo)-->
+                <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target','sender_member_srl', 'search_keyword', $pushData->sender_member_srl)}">
+                    [{$pushSenderMemberInfo->user_id}]
+                </a>
+                <!--@else-->
+                (탈퇴한 회원)
+                <!--@end-->
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">알림 종류</th>
+        <td>
+            <!--@if($pushData->type === 'comment')-->
+            댓글
+            <!--@else if($pushData->type === 'comment_comment')-->
+            대댓글
+            <!--@else if($pushData->type === 'mention')-->
+            멘션
+            <!--@else if($pushData->type === 'subscribe_notification')-->
+            알림등록
+            <!--@else if($pushData->type === 'vote')-->
+            추천
+            <!--@else if($pushData->type === 'message')-->
+            쪽지
+            <!--@else if($pushData->type === 'scrap')-->
+            스크랩
+            <!--@else if($pushData->type === 'admin_content')-->
+            어드민 알림
+            <!--@else if($pushData->type === 'custom')-->
+            기타 알림
+            <!--@else if($pushData->type === 'manual')-->
+            수동 전송
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">알림 내용</th>
+        <td>{htmlspecialchars($pushData->content_summary)}</td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">대상 URL</th>
+        <td>
+            <!--@if($pushData->target_url)-->
+            <a href="{$pushData->target_url}" target="_blank">{$pushData->target_url}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">문서 번호</th>
+        <td>
+            <!--@if($pushData->document_srl != 0)-->
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target', 'document_srl', 'search_keyword', $pushData->document_srl, 'page', '')}">{$pushData->document_srl}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">대상 번호</th>
+        <td>
+            <!--@if($pushData->target_srl != 0)-->
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target', 'target_srl', 'search_keyword', $pushData->target_srl, 'page', '')}">{$pushData->target_srl}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">발송 여부</th>
+        <td>
+            <!--@if($pushData->status_code === 201)-->
+            <span style="color:blue;">발송성공</span>
+            <!--@else-->
+            <span style="color:red;">발송실패</span>
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">수신 여부</th>
+        <td>{$pushData->is_readed === "Y" ? "수신" : "-"}</td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">수신 IP</th>
+        <td>
+            <!--@if($pushData->read_ipaddress)-->
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target', 'ipaddress', 'search_keyword', $pushData->read_ipaddress, 'page', '')}" target="_blank">{$pushData->read_ipaddress}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">수신 시각</th>
+        <td>{$pushData->read_date ? zdate($pushData->read_date, 'Y-m-d H:i:s') : "-"}</td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">알림 클릭 여부</th>
+        <td>{$pushData->is_clicked === "Y" ? "클릭" : "-"}</td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">알림 클릭 IP</th>
+        <td>
+            <!--@if($pushData->click_ipaddress)-->
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target', 'ipaddress', 'search_keyword', $pushData->click_ipaddress)}" target="_blank">{$pushData->click_ipaddress}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">알림 클릭시각</th>
+        <td>{$pushData->click_date ? zdate($pushData->click_date, 'Y-m-d H:i:s') : "-"}</td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">발송시각</th>
+        <td>{zdate($pushData->regdate, 'Y-m-d H:i:s')}</td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">[테스트] 재전송</th>
+        <td>
+            <!--@if($endpointData)-->
+            해당 단말기로 <input type="number" value="100000" class="resend-push-count" style="width:120px;"> 회 재전송
+            <a class="modalAnchor x_btn xe-modal-window resend-push-btn" style="margin: 0 0 0 30px;" href="javascript:;" onclick="window.notiPushResend({$pushData->push_srl});">전송</a>
+            <BR>
+            푸시를 최대 2500개로 묶어서 메세지 큐로 푸시 요청. 입력범위 : 1 ~ 100,000,000<BR>
+            <b style="color:red;">주의: 본 기능은 대량푸시 테스트를 위한 기능임.</b>
+
+            <div class="resend-push-status" style="display: none; padding: 18px 0 0 0;">
+
+                <dl>
+                    <dt>
+                        진행상태 :
+                    </dt>
+                    <dd style="font-weight: bold;">
+                        <span class="current-count">0</span> / <span class="total-count">0</span>
+                    </dd>
+                    <dd>
+                        <a class="modalAnchor x_btn xe-modal-window resend-push-cancel" href="javascript:;" onclick="window.notiPushResendCancel()">취소</a>
+                    </dd>
+                </dl>
+                <p>
+                    <b>
+                        메세지 큐에 푸시 작업이 남아있을 경우 푸시 작업을 취소하더라도 계속 전송될 수 있음.<BR>
+                        긴급히 중단해야 할 경우 푸시 메세지 큐를 퍼지하고 nodejs 서버를 종료해야 함.
+                    </b>
+                </p>
+            </div>
+            <!--@else-->
+                존재하지 않는 단말기
+            <!--@end-->
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<BR>
+<BR>
+
+<h2>페이로드 정보</h2>
+<table cond="$payloadData" class="x_table x_table-striped x_table-hover">
+    <colgroup>
+        <col width="120">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th scope="col" class="nowr">제목</th>
+        <td>
+            <!--@if(isset($payloadData->title))-->
+            {$payloadData->title}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">내용</th>
+        <td>
+            <!--@if(isset($payloadData->body))-->
+            {$payloadData->body}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">이동 URL</th>
+        <td>
+            <!--@if(isset($payloadData->launchUrl) && $payloadData->launchUrl)-->
+            <a href="{$payloadData->launchUrl}" target="_blank">{$payloadData->launchUrl}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">아이콘 URL</th>
+        <td>
+            <!--@if(isset($payloadData->icon) && $payloadData->icon)-->
+            <a href="{$payloadData->icon}" target="_blank">{$payloadData->icon}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">이미지 URL</th>
+        <td>
+            <!--@if(isset($payloadData->image) && $payloadData->image)-->
+            <a href="{$payloadData->image}" target="_blank">{$payloadData->image}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">뱃지 URL</th>
+        <td>
+            <!--@if(isset($payloadData->badge) && $payloadData->badge)-->
+            <a href="{$payloadData->badge}" target="_blank">{$payloadData->badge}</a>
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">고요모드</th>
+        <td>
+            <!--@if(isset($payloadData->silent) && $payloadData->silent)-->
+            사용
+            <!--@else-->
+            사용 안 함
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">requireInteraction</th>
+        <td>
+            <!--@if(isset($payloadData->requireInteraction) && $payloadData->requireInteraction)-->
+            사용
+            <!--@else-->
+            사용 안 함
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">재알림</th>
+        <td>
+            <!--@if(isset($payloadData->renotify) && $payloadData->renotify)-->
+            사용
+            <!--@else-->
+            사용 안 함
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">TTL</th>
+        <td>
+            <!--@if(isset($payloadData->ttl))-->
+            {$payloadData->ttl}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">우선순위</th>
+        <td>
+            <!--@if(isset($payloadData->urgency))-->
+            {$payloadData->urgency}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">알림 이름</th>
+        <td>
+            <!--@if(isset($payloadData->name))-->
+            {$payloadData->name}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">알림 태그</th>
+        <td>
+            <!--@if(isset($payloadData->tag))-->
+            {$payloadData->tag}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">푸시그룹 ID</th>
+        <td>
+            <!--@if(isset($payloadData->pushGroup))-->
+            {$payloadData->pushGroup->push_group_srl}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">메세지 누적 알림 사용</th>
+        <td>
+            <!--@if(isset($payloadData->pushGroup) && $payloadData->pushGroup->use_count_summary)-->
+            사용
+            <!--@else-->
+            사용 안 함
+            <!--@end-->
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">메세지 누적 알림 템플릿</th>
+        <td>
+            <!--@if(isset($payloadData->pushGroup) && $payloadData->pushGroup->count_summary_template)-->
+            {str_replace("\r\n", "<BR>", $payloadData->pushGroup->count_summary_template)}
+            <!--@else-->
+            -
+            <!--@end-->
+        </td>
+    <tr>
+        <th scope="col" class="nowr">Payload 원본 (JSON)</th>
+        <td>
+            <a href="https://jsonformatter.curiousconcept.com/?data={urlencode($pushData->push_payload)}&process=true" target="_blank">
+                {$pushData->push_payload}
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">알림 미리보기</th>
+        <td>
+            <a class="modalAnchor x_btn xe-modal-window" href="javascript:;" onclick="window.notiPushPreview({$pushData->push_srl});">미리보기</a>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<BR>
+<BR>
+
+<block cond="$pushResponse">
+    <h2>서버응답 정보</h2>
+
+    <!--@if(isset($pushResponse->error))-->
+    <table cond="$payloadData" class="x_table x_table-striped x_table-hover">
+        <colgroup>
+            <col width="120">
+        </colgroup>
+        <tbody>
+
+        <tr>
+            <th scope="col" class="nowr">Error</th>
+            <td>
+                Y
+            </td>
+        </tr>
+
+        <tr>
+            <th scope="col" class="nowr">Name</th>
+            <td>
+                {$pushResponse->name}
+            </td>
+        </tr>
+
+        <tr cond="isset($pushResponse->statusCode)">
+            <th scope="col" class="nowr">StatusCode</th>
+            <td>
+                {htmlspecialchars($pushResponse->statusCode)}
+            </td>
+        </tr>
+
+        <tr>
+            <th scope="col" class="nowr">Message</th>
+            <td>
+                {$pushResponse->message}
+            </td>
+        </tr>
+
+        <tr>
+            <th scope="col" class="nowr">Stack</th>
+            <td>
+                {$pushResponse->stack}
+            </td>
+        </tr>
+
+        <tr cond="isset($pushResponse->endpoint)">
+            <th scope="col" class="nowr">Endpoint</th>
+            <td>
+                {htmlspecialchars($pushResponse->endpoint)}
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+    <!--@else-->
+    <table cond="$payloadData" class="x_table x_table-striped x_table-hover">
+        <colgroup>
+            <col width="120">
+        </colgroup>
+        <tbody>
+        <tr>
+            <th scope="col" class="nowr">StatusCode</th>
+            <td>
+                {htmlspecialchars($pushResponse->statusCode)}
+            </td>
+        </tr>
+
+        <tr>
+            <th scope="col" class="nowr">Body</th>
+            <td>
+                {htmlspecialchars($pushResponse->body)}
+            </td>
+        </tr>
+
+        <tr>
+            <th scope="col" class="nowr">Headers</th>
+            <td>
+                <block loop="get_object_vars($pushResponse->headers) => $key, $val">
+                    <p>{htmlspecialchars($key)}: {htmlspecialchars($val)}</p>
+                </block>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!--@end-->
+
+</block>
+
+
+
+
+<form action="./" method="post">
+    <input type="hidden" name="error_return_url" value="/">
+    <input type="hidden" name="mid" value="">
+    <input type="hidden" name="module" value="{$module}">
+    <input type="hidden" name="act" value="procNotiAdminPushLogDelete">
+    <input type="hidden" type="number" name="push_srl" value="{$pushData->push_srl}"|cond="$pushData">
+
+    <div class="x_pull-left">
+        <button class="x_btn" type="button" onclick="history.go(-1)">목록</button>
+    </div>
+
+    <div class="x_pull-right">
+        <button type="submit" name="is_all" class="x_btn" value="false">삭제</button>
+    </div>
+</form>
+
+<include target="_footer.html" />

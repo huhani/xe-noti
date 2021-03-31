@@ -1,0 +1,26 @@
+<query id="getMemberWithEndpointCount" action="select">
+    <tables>
+        <table name="member" />
+        <table name="noti_endpoint" alias="noti_endpoint" type="left join">
+            <conditions>
+                <condition operation="equal" column="noti_endpoint.member_srl" default="member.member_srl" />
+            </conditions>
+        </table>
+    </tables>
+    <columns>
+        <column name="member.member_srl" alias="member_srl" />
+        <column name="member.nick_name" alias="nick_name" />
+        <column name="count(noti_endpoint.endpoint_srl)" alias="endpoint_count" />
+    </columns>
+    <conditions>
+        <condition operation="like" column="member.nick_name" var="nick_name" />
+    </conditions>
+    <groups>
+        <group column="member.member_srl" />
+    </groups>
+    <navigation>
+        <index default="endpoint_count" order="endpoint_count_order_type" />
+        <index var="sort_index" default="member.regdate" order="order_type" />
+        <list_count var="list_count" default="100" />
+    </navigation>
+</query>

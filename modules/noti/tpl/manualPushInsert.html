@@ -1,0 +1,267 @@
+
+
+<load target="css/choices.min.css" />
+<load target="js/choices.min.js" />
+<load target="js/manualPushInsert.js" />
+
+<div class="x_page-header">
+    <h1>
+        알림 수동 전송
+    </h1>
+</div>
+
+<!--TODO-->
+<div cond="$XE_VALIDATOR_MESSAGE && $XE_VALIDATOR_ID == ''" class="message {$XE_VALIDATOR_MESSAGE_TYPE}">
+    <p>{$XE_VALIDATOR_MESSAGE}</p>
+</div>
+
+<form action="/" method="post" class="x_form-horizontal">
+    <input type="hidden" name="module" value="{$module}">
+    <input type="hidden" name="act" value="procNotiAdminManualPushInsert">
+    <input type="hidden" name="success_return_url" value="{getUrl('', 'module', 'admin', 'act', 'dispNotiAdminManualPushList')}">
+
+    <div class="x_control-group" cond="$manualPush">
+        <label class="x_control-label">재전송 대상 ID</label>
+        <div class="x_controls">
+
+            <div style="margin: 5px 0 0 0;">
+                <p>
+                    {$manualPush->manual_push_srl}
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">전송 대상</label>
+        <div class="x_controls">
+            <label class="x_inline" for="type_public">
+                <input type="radio" id="type_public" name="type" value="public" checked="checked"|cond="!$manualPush || $manualPush->type === 'public'">모든 단말기</label>
+
+            <label class="x_inline" for="type_private">
+                <input type="radio" id="type_private" name="type" value="private" checked="checked"|cond="$manualPush && $manualPush->type === 'private'">선택한 유저</label>
+
+            <a href="#type_help" class="x_icon-question-sign" data-toggle="#type_help">{$lang->help}</a>
+            <p id="type_help" class="x_help-block" hidden="hidden">푸시 메세지 전송대상을 선택합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">전송 대상 정보</label>
+        <div class="x_controls">
+            <style>
+                .choices__input {min-width: 20ch !important;}
+            </style>
+            <div class="select-member__container" style="margin:0 0 15px 0;">
+                <select name="target_member_srls[]" class="select-member" multiple="multiple" >
+                    <option value="">닉네임을 입력해주세요</option>
+                </select>
+            </div>
+
+            <div class="push-device-count" data-total-count="{$totalEndpointCount}" style="margin: 5px 0 0 0;">
+                <p>
+                    전송할 단말기 수 (예상): <span class="count"><b>0</b></span>
+                </p>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">
+            <em style="color:red">*</em>
+            제목</label>
+        <div class="x_controls">
+            <label class="x_inline" for="manualPush_title">
+                <input type="text" id="manualPush_title" name="title" value="{$manualPush->title}"|cond="$manualPush" style="width:450px;" />
+            </label>
+            <a href="#manualPush_title_help" class="x_icon-question-sign" data-toggle="#manualPush_title_help">{$lang->help}</a>
+            <p id="manualPush_title_help" class="x_help-block" hidden="hidden">푸시 제목을 설정합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">내용</label>
+        <div class="x_controls">
+            <label class="x_inline" for="manualPush_content">
+                <textarea name="content" id="manualPush_content" rows="3" style="width:450px;"><!--@if($manualPush)-->{$manualPush->content}<!--@end--></textarea>
+            </label>
+            <a href="#manualPush_content_help" class="x_icon-question-sign" data-toggle="#manualPush_content_help">{$lang->help}</a>
+            <p id="manualPush_content_help" class="x_help-block" hidden="hidden">푸시 내용을 입력합니다. 내용을 입력하지 않을 경우 제목만 표시합니다.
+            </p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">아이콘 URL</label>
+        <div class="x_controls">
+            <label class="x_inline" for="manualPush_icon">
+                <input type="text" id="manualPush_icon" name="icon" value="{$manualPush->icon}"|cond="$manualPush" style="width:450px;" />
+            </label>
+            <a href="#manualPush_icon_help" class="x_icon-question-sign" data-toggle="#manualPush_icon_help">{$lang->help}</a>
+            <p id="manualPush_icon_help" class="x_help-block" hidden="hidden">푸시에 출력할 jpg, png 아이콘 파일의 URL(https)을 입력합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">이미지 URL</label>
+        <div class="x_controls">
+            <label class="x_inline" for="manualPush_image">
+                <input type="text" id="manualPush_image" name="image" value="{$manualPush->image}"|cond="$manualPush" style="width:450px;" />
+            </label>
+            <a href="#manualPush_image_help" class="x_icon-question-sign" data-toggle="#manualPush_image_help">{$lang->help}</a>
+            <p id="manualPush_image_help" class="x_help-block" hidden="hidden">푸시에 출력할 이미지 파일 URL(https)을 입력합니다. 일부 브라우저에선 출력이 되지 않을 수 있습니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">뱃지 URL</label>
+        <div class="x_controls">
+            <label class="x_inline" for="manualPush_badge">
+                <input type="text" id="manualPush_badge" name="badge" value="{$manualPush->badge}"|cond="$manualPush" style="width:450px;" />
+            </label>
+            <a href="#manualPush_badge_help" class="x_icon-question-sign" data-toggle="#manualPush_badge_help">{$lang->help}</a>
+            <p id="manualPush_badge_help" class="x_help-block" hidden="hidden">푸시에 출력할 뱃지 아이콘 파일 URL(https)을 입력합니다. 일부 브라우저에선 출력이 되지 않을 수 있습니다.</p>
+        </div>
+    </div>
+
+
+    <div class="x_control-group">
+        <label class="x_control-label">이동 URL</label>
+        <div class="x_controls">
+            <label class="x_inline" for="manualPush_target_url">
+                <input type="text" id="manualPush_target_url" name="target_url" value="{$manualPush->target_url}"|cond="$manualPush" style="width:450px;" />
+            </label>
+            <a href="#manualPush_target_url_help" class="x_icon-question-sign" data-toggle="#manualPush_target_url_help">{$lang->help}</a>
+            <p id="manualPush_target_url_help" class="x_help-block" hidden="hidden">푸시알림 클릭시 이동할 URL을 입력합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">requireInteraction</label>
+        <div class="x_controls">
+            <label class="x_inline" for="use_require_interaction">
+                <input type="radio" id="use_require_interaction" name="require_interaction" value="Y" checked="checked"|cond="!$manualPush || $manualPush->require_interaction === 'Y'">{$lang->use}</label>
+
+            <label class="x_inline" for="not_use_require_interaction">
+                <input type="radio" id="not_use_require_interaction" name="require_interaction" value="N" checked="checked"|cond="$manualPush && $manualPush->require_interaction === 'N'">{$lang->not_use}</label>
+
+            <a href="#require_interaction_help" class="x_icon-question-sign" data-toggle="#require_interaction_help">{$lang->help}</a>
+            <p id="require_interaction_help" class="x_help-block" hidden="hidden">requireInteraction 기능을 사용합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">renotify</label>
+        <div class="x_controls">
+            <label class="x_inline" for="use_renotify">
+                <input type="radio" id="use_renotify" name="renotify" value="Y" checked="checked"|cond="!$manualPush || $manualPush->renotify === 'Y'">{$lang->use}</label>
+
+            <label class="x_inline" for="not_use_renotify">
+                <input type="radio" id="not_use_renotify" name="renotify" value="N" checked="checked"|cond="$manualPush && $manualPush->renotify === 'N'">{$lang->not_use}</label>
+
+            <a href="#renotify_help" class="x_icon-question-sign" data-toggle="#renotify_help">{$lang->help}</a>
+            <p id="renotify_help" class="x_help-block" hidden="hidden">renotify 기능을 사용합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">silent</label>
+        <div class="x_controls">
+            <label class="x_inline" for="use_silent">
+                <input type="radio" id="use_silent" name="silent" value="Y" checked="checked"|cond="$manualPush && $manualPush->silent === 'Y'">{$lang->use}</label>
+
+            <label class="x_inline" for="not_use_silent">
+                <input type="radio" id="not_use_silent" name="silent" value="N" checked="checked"|cond="!$manualPush || $manualPush->silent === 'N'">{$lang->not_use}</label>
+
+            <a href="#silent_help" class="x_icon-question-sign" data-toggle="#silent_help">{$lang->help}</a>
+            <p id="silent_help" class="x_help-block" hidden="hidden">silent 기능을 사용합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">우선순위</label>
+        <div class="x_controls">
+            <label class="x_inline" for="urgency_very-low">
+                <input type="radio" id="urgency_very-low" name="urgency" value="very-low" checked="checked"|cond="$manualPush && $manualPush->urgency === 'very-low'">매우 낮음</label>
+
+            <label class="x_inline" for="urgency_low">
+                <input type="radio" id="urgency_low" name="urgency" value="low" checked="checked"|cond="$manualPush && $manualPush->urgency === 'low'">낮음</label>
+
+            <label class="x_inline" for="urgency_normal">
+                <input type="radio" id="urgency_normal" name="urgency" value="normal" checked="checked"|cond="!$manualPush || $manualPush->urgency === 'normal'">보통</label>
+
+            <label class="x_inline" for="urgency_high">
+                <input type="radio" id="urgency_high" name="urgency" value="high" checked="checked"|cond="$manualPush && $manualPush->urgency === 'high'">높음</label>
+
+            <a href="#urgency_help" class="x_icon-question-sign" data-toggle="#urgency_help">{$lang->help}</a>
+            <p id="urgency_help" class="x_help-block" hidden="hidden">푸시의 우선순위를 설정합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">
+            <em style="color:red">*</em>
+            TTL</label>
+        <div class="x_controls">
+            <label class="x_inline" for="ttl">
+                <input type="number" style="width: 120px;" id="ttl" name="ttl" value="{$manualPush ? $manualPush->ttl : 172800}" />
+            </label>
+            <a href="#ttl_help" class="x_icon-question-sign" data-toggle="#ttl_help">{$lang->help}</a>
+            <p id="ttl_help" class="x_help-block" hidden="hidden">메세지 수명을 설정합니다. 단위 : 초, 기본값 : 2주</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">
+            <em style="color:red">*</em>
+            전송 횟수
+        </label>
+        <div class="x_controls">
+            <label class="x_inline" for="send_count">
+                <input type="number" style="width: 120px;" id="send_count" name="send_count" value="{$manualPush ? $manualPush->send_count : 1}" />
+            </label>
+            <a href="#send_count_help" class="x_icon-question-sign" data-toggle="#send_count_help">{$lang->help}</a>
+            <p id="send_count_help" class="x_help-block" hidden="hidden">
+                특정 유저에게  전송할 단말기에 지정한 횟수만큼 동일한 메세지를 보냅니다.<BR>
+                입력깂 범위 : 1 ~ 10,000,000,000
+            </p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label for="push_group" class="x_control-label">푸시 그룹</label>
+        <div class="x_controls">
+            <select name="push_group_srl" id="push_group">
+                <option loop="$pushGroupList => $pushGroupKey, $pushGroupVal" value="{$pushGroupVal['push_group_srl']}" data-use-count-summary="{htmlentities($pushGroupVal['use_count_summary'])}" data-count-summary-template="{htmlentities($pushGroupVal['count_summary_template'])}" data-max-count="{$pushGroupVal['max_count']}" data-name="{htmlentities($pushGroupVal['name'])}" selected|cond="$manualPush->push_group_srl == $pushGroupVal['push_group_srl']">{$pushGroupVal['name']}</option>
+            </select>
+
+            <a href="#push_group_help" class="x_icon-question-sign" data-toggle="#push_group_help">{$lang->help}</a>
+            <p id="push_group_help" class="x_help-block" hidden="hidden">푸시 알림의 그룹을 설정합니다. 같은 그룹의 알림을 한 개의 알림으로 묶어 처리합니다.</p>
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label for="push_group" class="x_control-label">테스트</label>
+        <div class="x_controls">
+            <a href="javascript:;" onclick="previewManualPush();" class="x_btn">미리보기</a>
+            <a href="javascript:;" onclick="closeAllNotification();" class="x_btn">열려있는 모든알림 닫기</a>
+
+            <p class="x_help-block">브라우저가 푸시알림을 지원하는 경우에만 테스트 할 수 있습니다.</p>
+        </div>
+    </div>
+
+
+    <div class="x_clearfix btnArea">
+        <div class="x_pull-left">
+            <a href="{getUrl('act', 'dispNotiAdminManualPushList', 'manual_push_srl', '')}" class="x_btn">목록</a>
+        </div>
+        <span class="x_pull-right">
+            <input class="x_btn x_btn-primary" type="submit" value="{$lang->cmd_send}" />
+        </span>
+    </div>
+
+
+</form>
+

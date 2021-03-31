@@ -1,0 +1,254 @@
+<!--// HEADER -->
+<include target="_header.html" />
+
+
+
+
+
+<h2>단말기 푸시요약</h2>
+
+<table cond="$endpointSummary" class="x_table x_table-striped x_table-hover">
+    <colgroup>
+        <col width="120">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th scope="col" class="nowr">통계 범위</th>
+        <td>
+            <select class="selectStartDate">
+                <option value="7" selected="selected"|cond="$startDate === 7">7일</option>
+                <option value="30" selected="selected"|cond="$startDate === 30">30일</option>
+                <option value="180" selected="selected"|cond="$startDate === 180">180일</option>
+                <option value="365" selected="selected"|cond="$startDate === 365">365일</option>
+                <option value="-1" selected="selected"|cond="!$startDate">전체</option>
+            </select>
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">마지막 클릭시각</th>
+        <td>
+            {$endpointSummary->lastClickDate ? zdate($endpointSummary->lastClickDate, 'Y-m-d H:i:s') : "-"}
+            <!--@if($endpointSummary->lastClickDate)-->
+            ({$endpointSummary->lastClickDateTimeGap})
+            <!--@end-->
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">마지막 수신시각</th>
+        <td>
+            {$endpointSummary->lastReceiveDate ? zdate($endpointSummary->lastReceiveDate, 'Y-m-d H:i:s') : "-"}
+            <!--@if($endpointSummary->lastReceiveDate)-->
+            ({$endpointSummary->lastReceiveDateTimeGap})
+            <!--@end-->
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">마지막 발송시각</th>
+        <td>
+
+            {$endpointSummary->lastSendDate ? zdate($endpointSummary->lastSendDate, 'Y-m-d H:i:s') : "-"}
+            <!--@if($endpointSummary->lastSendDate)-->
+            ({$endpointSummary->lastSendDateTimeGap})
+            <!--@end-->
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">총 푸시 수</th>
+        <td>
+            {$endpointSummary->totalSendCount}
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">총 수신 수</th>
+        <td>
+            {$endpointSummary->totalReadCount}
+            ({$endpointSummary->totalReadCount > 0 ? (int)($endpointSummary->totalReadCount / $endpointSummary->totalSendCount * 100) : 0}%)
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">총 클릭 수</th>
+        <td>
+            {$endpointSummary->totalClickCount}
+            ({$endpointSummary->totalClickCount > 0 ? (int)($endpointSummary->totalClickCount / $endpointSummary->totalSendCount * 100) : 0}%)
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">평균 푸시 수신 시간</th>
+        <td>
+            {$endpointSummary->avgReadTimeStr}
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">평균 푸시 클릭 시간</th>
+        <td>
+            {$endpointSummary->avgClickTimeStr}
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">평균 푸시 클릭 시간<BR>(수신 후)</th>
+        <td>
+            {$endpointSummary->avgClickTimeSinceReadStr}
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">푸시 로그</th>
+        <td>
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushLogList', 'search_target', 'endpoint_srl', 'search_keyword', $endpointData->endpoint_srl)}">목록으로 이동</a>
+        </td>
+    </tr>
+
+    </tbody>
+</table>
+<BR>
+<BR>
+
+
+<h2>단말기 상세정보</h2>
+<table cond="$endpointData" class="x_table x_table-striped x_table-hover">
+    <colgroup>
+        <col width="120">
+    </colgroup>
+    <tbody>
+    <tr>
+        <th scope="col" class="nowr">단말기 ID</th>
+        <td>
+            {$endpointData->endpoint_srl}
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">닉네임</th>
+        <td>
+            <a href="#popup_menu_area" class="member_{$endpointData->member_srl}" onclick="return false">{$endpointData->nick_name}</a>
+            <!--@if(endpointMemberInfo)-->
+            [{$endpointMemberInfo->user_id}]
+            <!--@else-->
+            (탈퇴한 회원)
+            <!--@end-->
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">플랫폼</th>
+        <td>
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminEndpointList', 'search_target', 'platform', 'search_keyword', $endpointData->platform)}">
+                {$endpointData->platform}
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">브라우저</th>
+        <td>
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminEndpointList', 'search_target', 'browser', 'search_keyword', $endpointData->browser)}">
+                {$endpointData->browser}
+            </a>
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">User Agent</th>
+        <td>
+            {htmlspecialchars($endpointData->user_agent)}
+        </td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">endpoint</th>
+        <td>{htmlspecialchars($endpointData->endpoint)}</td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">auth</th>
+        <td>{htmlspecialchars($endpointData->auth)}</td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">key</th>
+        <td>{htmlspecialchars($endpointData->key)}</td>
+    </tr>
+    <tr>
+        <th scope="col" class="nowr">지원 인코딩</th>
+        <td>{htmlspecialchars($endpointData->supported_encoding)}</td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">등록 IP</th>
+        <td>
+            <a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminEndpointList', 'search_target', 'ipaddress', 'search_keyword', $endpointData->ipaddress)}">
+                {$endpointData->ipaddress}
+            </a>
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">전체 푸시 횟수</th>
+        <td>
+            {$endpointData->send_count}
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">전체 수신 횟수</th>
+        <td>
+            {$endpointData->read_count}
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">전체 클릭 횟수</th>
+        <td>
+            {$endpointData->click_count}
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">최근 업데이트</th>
+        <td>
+            {zdate($endpointData->last_update, 'Y-m-d H:i:s')}
+        </td>
+    </tr>
+
+    <tr>
+        <th scope="col" class="nowr">등록일</th>
+        <td>{zdate($endpointData->regdate, 'Y-m-d H:i:s')}</td>
+    </tr>
+    </tbody>
+</table>
+<BR>
+
+
+<form action="./" method="post">
+    <input type="hidden" name="error_return_url" value="{getUrl('act', 'dispNotiAdminEndpointList', 'endpoint_srl', '')}">
+    <input type="hidden" name="mid" value="">
+    <input type="hidden" name="module" value="{$module}">
+    <input type="hidden" name="act" value="procNotiAdminEndpointDelete">
+    <input type="hidden" type="number" name="endpoint_srl" value="{$endpointData->endpoint_srl}"|cond="$endpointData">
+
+    <div class="x_pull-left">
+        <a href="{getUrl('act', 'dispNotiAdminEndpointList', 'endpoint_srl', '')}" class="x_btn modalAnchor xe-modal-window" >목록</a>
+    </div>
+
+    <div class="x_pull-right">
+        <button type="submit" name="is_all" class="x_btn" value="false">삭제</button>
+    </div>
+</form>
+
+<include target="_footer.html" />
+
+<script>
+    (function($){
+        $(document).ready(function(){
+            $('.selectStartDate').change(function(){
+                var $this = $(this);
+                window.location.href = window.location.href.setQuery('startDate', $this.val());
+            });
+        });
+    })(window.jQuery);
+
+
+</script>

@@ -1,0 +1,24 @@
+<table name="noti_manual_push">
+    <column name="manual_push_srl" type="number" size="11" primary_key="primary_key" />
+    <column name="member_srl" type="number" size="11" default="0" notnull="notnull" index="idx_member_srl" />
+    <column name="nick_name" type="varchar" size="40" />
+
+    <column name="type" type="varchar" size="25" default="unknown" notnull="notnull" />
+    <column name="title" type="varchar" size="500" />
+    <column name="content" type="text" />
+    <column name="ipaddress" type="varchar" size="128" notnull="notnull" />
+    <column name="icon" type="varchar" size="300" />
+    <column name="badge" type="varchar" size="300" />
+    <column name="image" type="varchar" size="300" />
+    <column name="target_url" type="varchar" size="300" />
+    <column name="actions" type="text" />
+    <column name="require_interaction" type="char" size="1" default="N" notnull="notnull" />
+    <column name="renotify" type="char" size="1" default="N" notnull="notnull" />
+    <column name="silent" type="char" size="1" default="N" notnull="notnull" />
+    <column name="urgency" type="varchar" size="25" default="normal" notnull="notnull" />
+    <column name="ttl" type="number" size="11" default="0" notnull="notnull" />
+    <column name="send_count" type="number" size="11" default="1" notnull="notnull" />
+    <column name="push_group_srl" type="number" size="11" default="-1" notnull="notnull" />
+
+    <column name="regdate" notnull="notnull" type="date" index="idx_regdate" />
+</table>

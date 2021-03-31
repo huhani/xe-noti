@@ -1,0 +1,30 @@
+<table name="noti_push">
+	<column name="push_srl" type="number" size="11" primary_key="primary_key" />
+	<column name="endpoint_srl" type="number" size="11" default="0" notnull="notnull" index="idx_endpoint_srl" />
+	<column name="member_srl" type="number" size="11" default="0" notnull="notnull" index="idx_member_srl" />
+	<column name="nick_name" type="varchar" size="40" brief="알림 수신인 닉네임" />
+	<column name="type" type="varchar" size="25" notnull="notnull" />
+	<column name="notify" type="char" size="32" default="null" brief="메시지 ID" />
+
+	<column name="sender_member_srl" type="number" size="11" default="0" notnull="notnull" />
+	<column name="sender_nick_name" type="varchar" size="40" />
+	<column name="sender_profile_image" type="varchar" size="150" />
+
+	<column name="content_summary" type="varchar" size="500" />
+	<column name="document_srl" type="number" size="11" default="0" notnull="notnull" />
+	<column name="target_srl" type="number" size="11" default="0" notnull="notnull" />
+	<column name="target_url" type="varchar" size="300" />
+	<column name="push_payload" type="text" />
+	<column name="push_response" type="text" />
+
+	<column name="is_readed" type="char" size="1" default="N" notnull="notnull" />
+	<column name="read_date" type="date" />
+	<column name="read_ipaddress" type="varchar" size="128" />
+
+	<column name="is_clicked" type="char" size="1" default="N" notnull="notnull" />
+	<column name="click_date" type="date" />
+	<column name="click_ipaddress" type="varchar" size="128" />
+
+	<column name="status_code" type="number" size="11" default="0" notnull="notnull" />
+	<column name="regdate" notnull="notnull" type="date" index="idx_regdate" />
+</table>

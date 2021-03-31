@@ -1,0 +1,11 @@
+<query id="deleteNotiDormantEndpoint" action="delete">
+    <tables>
+        <table name="noti_endpoint" />
+    </tables>
+    <conditions>
+        <condition operation="like_prefix" column="last_send" var="last_send" pipe="or" />
+        <condition operation="like_prefix" column="last_read" var="last_read" pipe="or" />
+        <condition operation="like_prefix" column="last_click" var="last_click" pipe="or" />
+        <condition operation="like_prefix" column="regdate" var="s_regdate" pipe="or" />
+    </conditions>
+</query>
