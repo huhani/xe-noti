@@ -22,8 +22,6 @@ class notiAdminView extends noti
         Context::set('notiConfig', $notiConfig);
         Context::set('pushGroupList', $pushGroupList);
 
-        debugPrint($pushGroupList);
-
         $this->setTemplateFile('moduleConfig');
     }
 
