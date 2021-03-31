@@ -5,9 +5,7 @@ var always = require("../../always");
 var helper = require("../../helper");
 var __extend = require("../../extend");
 var pushNotification = function() {
-
-    // fcm, vapid서버에 전송해주는 역할
-    //
+    
     function pushNotification() {
         var that = BaseTrigger.apply(this, arguments) || this;
         that._mqChannel = that._args.mqChannel;

@@ -5,9 +5,7 @@ var always = require("../../always");
 var helper = require("../../helper");
 var __extend = require("../../extend");
 var manualPush = function() {
-
-    // fcm, vapid서버에 전송해주는 역할
-    //
+    
     function manualPush() {
         var that = BaseTrigger.apply(this, arguments) || this;
         that._mqChannel = that._args.mqChannel;
@@ -16,11 +14,6 @@ var manualPush = function() {
     __extend(manualPush, BaseTrigger);
 
     manualPush.prototype._run = function() {
-
-        // 보낼사람 endpoint 값을 가져옴.
-        //전체발송시 끊어서 처리
-        // 아니면
-
         var that = this;
         var args = this._args;
         var argsData = args.data;
@@ -30,7 +23,6 @@ var manualPush = function() {
                 Promise.resolve();
 
         promise.then(function(result){
-            console.log("DONE!!!!!@!@!");
             that.resolve(result);
         })['catch'](function(err){
             that.reject(err);
