@@ -139,10 +139,6 @@ var NotiController = function() {
         return this.query(query, [this.getDBPrefix() + "noti_endpoint", this.getModel('noti').getEndpointCRC32(endpoint), endpoint]);
     };
 
-    NotiController.prototype.test = function(){
-        console.log("asdf");
-    };
-
     return NotiController;
 
 }();

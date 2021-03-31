@@ -1,5 +1,5 @@
 {
-  "gcm_sender_id": "97276647298",
+  "gcm_sender_id": "GCM ID를 입력해주세요",
   "name": "테스트서버",
   "short_name": "testserver",
   "start_url": "/index.php",

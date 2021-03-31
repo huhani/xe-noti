@@ -243,7 +243,6 @@ var AMQPManager = function AMQPManager () {
                         if(err){
                             deferred.reject(err);
                         } else {
-                            console.log("오예!");
                             deferred.resolve(channel);
                         }
                     });
@@ -401,7 +400,7 @@ var AMQPManager = function AMQPManager () {
                         deferred.resolve(connection);
                     }
                 })['catch'](function(err){
-                    console.error(3333331, err);
+                    console.error(err);
                     if(!aborted) {
                         deferred.reject(err);
                     }

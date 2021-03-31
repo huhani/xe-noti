@@ -44,13 +44,9 @@ channel.consume("noti-queue-push", function(msg){
 
 
 channel.consume("noti-queue-trigger", function(msg){
-
-    console.log(msg);
-
     always(new Promise(function(resolve, reject){
         db.getConnection().then(function(conn){
             var rxHelper = new RXHelper(config, conn);
-
             var data = JSON.parse(msg.content);
             var args = {};
             var triggerName = data.type;
@@ -74,7 +70,6 @@ channel.consume("noti-queue-trigger", function(msg){
             reject(err);
         });
     })).then(function(){
-        console.log("TRIGGER DONE!!!");
         channel.ack(msg);
     });
 
