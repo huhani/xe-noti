@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <lang>
 	<item name="noti">
-		<value xml:lang="ko"><![CDATA[알림]]></value>
+		<value xml:lang="ko"><![CDATA[푸시 알림]]></value>
 	</item>
 	<item name="use">
 		<value xml:lang="ko"><![CDATA[사용]]></value>
@@ -10,6 +10,6 @@
 		<value xml:lang="ko"><![CDATA[사용 안 함]]></value>
 	</item>
 	<item name="cmd_noti_config">
-		<value xml:lang="ko"><![CDATA[알림 설정]]></value>
+		<value xml:lang="ko"><![CDATA[웹푸시 설정]]></value>
 	</item>
 </lang>

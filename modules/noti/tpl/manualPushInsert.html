@@ -20,6 +20,13 @@
     <input type="hidden" name="act" value="procNotiAdminManualPushInsert">
     <input type="hidden" name="success_return_url" value="{getUrl('', 'module', 'admin', 'act', 'dispNotiAdminManualPushList')}">
 
+    <style cond="$notiConfig['simpleConfig']">
+        .x_control-group.noti-detail-config {
+            display:none;
+        }
+    </style>
+
+
     <div class="x_control-group" cond="$manualPush">
         <label class="x_control-label">재전송 대상 ID</label>
         <div class="x_controls">
@@ -37,10 +44,10 @@
         <label class="x_control-label">전송 대상</label>
         <div class="x_controls">
             <label class="x_inline" for="type_public">
-                <input type="radio" id="type_public" name="type" value="public" checked="checked"|cond="!$manualPush || $manualPush->type === 'public'">모든 단말기</label>
+                <input type="radio" id="type_public" name="target_device" value="public" checked="checked"|cond="!$manualPush || $manualPush->target_device === 'public'">모든 단말기</label>
 
             <label class="x_inline" for="type_private">
-                <input type="radio" id="type_private" name="type" value="private" checked="checked"|cond="$manualPush && $manualPush->type === 'private'">선택한 유저</label>
+                <input type="radio" id="type_private" name="target_device" value="private" checked="checked"|cond="$manualPush && $manualPush->target_device === 'private'">선택한 유저</label>
 
             <a href="#type_help" class="x_icon-question-sign" data-toggle="#type_help">{$lang->help}</a>
             <p id="type_help" class="x_help-block" hidden="hidden">푸시 메세지 전송대상을 선택합니다.</p>
@@ -65,6 +72,19 @@
                 </p>
             </div>
 
+        </div>
+    </div>
+
+    <div class="x_control-group">
+        <label class="x_control-label">
+            <em style="color:red">*</em>
+            알림 종류</label>
+        <div class="x_controls">
+            <label class="x_inline" for="manualPush_typeText_help">
+                <input type="text" id="manualPush_typeText" name="type" value="{$manualPush->type}"|cond="$manualPush" style="width:450px;" />
+            </label>
+            <a href="#manualPush_typeText_help" class="x_icon-question-sign" data-toggle="#manualPush_typeText_help">{$lang->help}</a>
+            <p id="manualPush_typeText_help" class="x_help-block" hidden="hidden">알림 종류를 입력합니다. 예: 전체공지</p>
         </div>
     </div>
 
@@ -100,7 +120,8 @@
                 <input type="text" id="manualPush_icon" name="icon" value="{$manualPush->icon}"|cond="$manualPush" style="width:450px;" />
             </label>
             <a href="#manualPush_icon_help" class="x_icon-question-sign" data-toggle="#manualPush_icon_help">{$lang->help}</a>
-            <p id="manualPush_icon_help" class="x_help-block" hidden="hidden">푸시에 출력할 jpg, png 아이콘 파일의 URL(https)을 입력합니다.</p>
+            <p id="manualPush_icon_help" class="x_help-block" hidden="hidden">푸시에 출력할 jpg, png 아이콘 파일의 URL(https)을 입력합니다.<BR>
+            URL을 입력하지 않을 경우 알림을 클릭해도 이동하지 않습니다.</p>
         </div>
     </div>
 
@@ -115,7 +136,7 @@
         </div>
     </div>
 
-    <div class="x_control-group">
+    <div class="x_control-group noti-detail-config">
         <label class="x_control-label">뱃지 URL</label>
         <div class="x_controls">
             <label class="x_inline" for="manualPush_badge">
@@ -138,7 +159,7 @@
         </div>
     </div>
 
-    <div class="x_control-group">
+    <div class="x_control-group noti-detail-config">
         <label class="x_control-label">requireInteraction</label>
         <div class="x_controls">
             <label class="x_inline" for="use_require_interaction">
@@ -152,7 +173,7 @@
         </div>
     </div>
 
-    <div class="x_control-group">
+    <div class="x_control-group noti-detail-config">
         <label class="x_control-label">renotify</label>
         <div class="x_controls">
             <label class="x_inline" for="use_renotify">
@@ -166,7 +187,7 @@
         </div>
     </div>
 
-    <div class="x_control-group">
+    <div class="x_control-group noti-detail-config">
         <label class="x_control-label">silent</label>
         <div class="x_controls">
             <label class="x_inline" for="use_silent">
@@ -180,7 +201,7 @@
         </div>
     </div>
 
-    <div class="x_control-group">
+    <div class="x_control-group noti-detail-config">
         <label class="x_control-label">우선순위</label>
         <div class="x_controls">
             <label class="x_inline" for="urgency_very-low">
@@ -200,7 +221,7 @@
         </div>
     </div>
 
-    <div class="x_control-group">
+    <div class="x_control-group noti-detail-config">
         <label class="x_control-label">
             <em style="color:red">*</em>
             TTL</label>
@@ -213,7 +234,7 @@
         </div>
     </div>
 
-    <div class="x_control-group">
+    <div class="x_control-group noti-detail-config">
         <label class="x_control-label">
             <em style="color:red">*</em>
             전송 횟수

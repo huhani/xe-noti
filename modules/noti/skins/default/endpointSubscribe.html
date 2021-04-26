@@ -1,0 +1,67 @@
+<load target="css/memberNoti.css" />
+<load target="js/memberNoti.js" />
+
+
+<div class="noti">
+
+	<include target="./_header.html" cond="$is_logged" />
+
+
+	<div class="noti-subscribe__container">
+
+		<h2>푸시설정</h2>
+		<div class="noti-subscribe">
+
+			<section>
+				<div class="control-group">
+					<label class="x_control-label">브라우저 알림 사용</label>
+					<div class="x_controls">
+
+						<label class="x_inline">
+							<label class="switch subscribe">
+								<input type="checkbox">
+								<span class="slider round"></span>
+							</label>
+						</label>
+						<p class="help-block">알림이 도착할 경우 브라우저 알림을 사용하여 표시합니다.</p>
+					</div>
+				</div>
+
+				<div class="control-group" cond="$notiConfig['allowDebugPage']">
+					<label class="x_control-label">디버깅</label>
+					<div class="x_controls">
+
+						<label class="x_inline">
+							<a href="{getUrl('', 'mid', 'noti', 'act', 'dispNotiEndpointDebug')}" style="text-decoration: underline">이동</a>
+						</label>
+						<p class="help-block">푸시 알림에 대한 자세한 정보를 확인합니다.</p>
+					</div>
+				</div>
+
+			</section>
+
+
+		</div>
+
+		<h2>푸시수신 목록</h2>
+		<div class="noti-pushlog__container">
+			<!--//푸시목록은 자바스크립트에서 제어함. -->
+		</div>
+
+	</div>
+
+	<div class="noti-not-supported__container">
+		<div class="not-supported-msg">
+			<img class="not-supported-icon" src="/modules/noti/skins/default/img/not_supported.png">
+			<p class="msg-big msg-bold">
+				웹 푸시를 지원하지 않는 브라우저입니다
+			</p>
+			<p class="msg-normal">
+				웹 푸시를 지원하는 Chrome, Firefox, Opera를 사용해보세요!
+			</p>
+		</div>
+	</div>
+
+</div>
+
+

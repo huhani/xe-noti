@@ -16,6 +16,7 @@
 		<column name="auth" var="auth" />
 		<column name="key" var="key" />
 		<column name="supported_encoding" var="supported_encoding" />
+		<column name="client_details" var="client_details" />
 		<column name="last_update" var="last_update" notnull="notnull" />
 		<column name="regdate" var="regdate" notnull="notnull" />
 	</columns>

@@ -172,13 +172,13 @@
             $('.push-device-count .count b').html(totalSendCount);
         });
 
-        $('input[type=radio][name=type]').on('focus', function() {
+        $('input[type=radio][name=target_device]').on('focus', function() {
             var $this = $(this);
             var type = $this.val();
             setPushTypeUI(type);
         });
 
-        setPushTypeUI($('input[name=type][value=public]').prop('checked') ? 'public' : 'private');
+        setPushTypeUI($('input[name=target_device][value=public]').prop('checked') ? 'public' : 'private');
         window.previewManualPush = previewManualPush;
         window.closeAllNotification = closeAllNotification;
     });

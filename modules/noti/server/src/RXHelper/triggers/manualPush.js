@@ -17,9 +17,9 @@ var manualPush = function() {
         var that = this;
         var args = this._args;
         var argsData = args.data;
-        var type = argsData.type;
-        var promise = type === 'public' ? this.sendPublic() :
-            type === 'private' ? this.sendPrivate() :
+        var targetDevice = argsData.targetDevice;
+        var promise = targetDevice === 'public' ? this.sendPublic() :
+            targetDevice === 'private' ? this.sendPrivate() :
                 Promise.resolve();
 
         promise.then(function(result){

@@ -18,6 +18,7 @@
 
         <tr>
             <th>번호</th>
+            <th>단말기 ID</th>
             <th>닉네임</th>
             <th>등록IP</th>
             <th>Endpoint</th>
@@ -41,9 +42,15 @@
             </td>
 
             <td>
+                <a href="{getUrl('act', 'dispNotiAdminPushLogList', 'search_target', 'endpoint_srl', 'search_keyword', $list->endpoint_srl, 'page', '')}">
+                {$list->endpoint_srl}
+                </a>
+            </td>
+
+            <td>
                 <a href="#popup_menu_area" class="member_{$list->member_srl}" onclick="return false">{$list->nick_name}</a>
                 <a href="{getUrl('search_target', 'member_srl', 'search_keyword', $list->member_srl, 'page', '')}">
-                    [{$list->user_id}]
+                    [{$list->member_srl > 0 ? $list->user_id : "비회원"}]
                 </a>
             </td>
 
@@ -54,7 +61,7 @@
             </td>
 
             <td>
-                {cut_str($list->endpoint, 40)}
+                {htmlspecialchars(cut_str($list->endpoint, 40))}
             </td>
 
             <td>
@@ -137,8 +144,8 @@
         <option value="platform" selected="selected"|cond="$search_target == 'platform'">플랫폼</option>
         <option value="browser" selected="selected"|cond="$search_target == 'browser'">브라우저</option>
         <option value="endpoint" selected="selected"|cond="$search_target == 'endpoint'">Endpoint</option>
-        <option value="auth" selected="selected"|cond="$search_target == 'auth'">Auth</option>
-        <option value="key" selected="selected"|cond="$search_target == 'key'">Key</option>
+        <option value="auth" selected="selected"|cond="$search_target == 'auth'" cond="!$notiConfig['simpleConfig']">Auth</option>
+        <option value="key" selected="selected"|cond="$search_target == 'key'" cond="!$notiConfig['simpleConfig']">Key</option>
         <option value="ipaddress" selected="selected"|cond="$search_target == 'ipaddress'">IP주소</option>
         <option value="regdate" selected="selected"|cond="$search_target == 'regdate'">등록일</option>
     </select>

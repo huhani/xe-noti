@@ -19,21 +19,21 @@
             <div class="x_controls">
                 <label class="x_inline" for="push_log_target_name">
                     <select name="target_name" id="push_log_target_name">
-                        <option value="endpoint_srl">endpoint_srl</option>
+                        <option value="endpoint_srl">단말기 ID</option>
                         <option value="nick_name">수신자 닉네임 (등록당시)</option>
                         <option value="nick_name_now">수신자 닉네임 (현재)</option>
                         <option value="mebmer_srl">수신자 회원번호</option>
                         <option value="sender_nick_name">수신자 닉네임 (등록당시)</option>
                         <option value="sender_nick_name_now">수신자 닉네임 (현재)</option>
                         <option value="sender_mebmer_srl">수신자 회원번호</option>
-                        <option value="document_srl">문서번호</option>
-                        <option value="target_srl">대상번호</option>
+                        <option value="document_srl" cond="!$notiConfig['simpleConfig']">문서번호</option>
+                        <option value="target_srl" cond="!$notiConfig['simpleConfig']">대상번호</option>
                         <option value="type">종류</option>
                         <option value="content_summary">알림내용</option>
-                        <option value="push_payload">Payload</option>
-                        <option value="status_code">StatusCode</option>
+                        <option value="push_payload" cond="!$notiConfig['simpleConfig']">Payload</option>
+                        <option value="status_code" cond="!$notiConfig['simpleConfig']">StatusCode</option>
                         <option value="target_url">URL</option>
-                        <option value="ipaddress">IP주소</option>
+                        <option value="ipaddress" cond="!$notiConfig['simpleConfig']">IP주소</option>
                         <option value="regdate">등록일</option>
                         <option value="">전체</option>
                     </select>

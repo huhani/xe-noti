@@ -1,9 +1,15 @@
 <query id="getPushLog" action="select">
 	<tables>
 		<table name="noti_push" />
+		<table name="noti_endpoint" alias="noti_endpoint" type="left join">
+			<conditions>
+				<condition operation="equal" column="noti_endpoint.endpoint_srl" default="noti_push.endpoint_srl" />
+			</conditions>
+		</table>
 	</tables>
 	<columns>
-		<column name="*" />
+		<column name="noti_push.*" />
+		<column name="noti_endpoint.endpoint" alias="endpoint" />
 	</columns>
 	<conditions>
 		<condition operation="equal" column="push_srl" var="push_srl" notnull="notnull" />

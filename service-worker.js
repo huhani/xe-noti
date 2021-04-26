@@ -7,7 +7,7 @@ var getDocumentSrl = function(url) {
 	var regex = [
 		':\\/\\/(?:\\.?\\w+)+\\/[a-zA-Z_\\-]\\w+/(\\d+)',
 		':\\/\\/(?:\\.?\\w+)+\\/(\\d+)',
-		'(?<!target_)document_srl=(\\d+)'
+		'(?!target_)(?:^.{0,})document_srl=(\\d+)'
 	];
 	if(url) {
 		for(var i=0; i<regex.length; i++) {
@@ -114,9 +114,10 @@ self.addEventListener('push', function(event) {
 				});
 			}
 		}).then(function(){
-			return Promise.all([self.registration.pushManager.getSubscription(), notiEventHandler('push', payload.push_srl, eventObj)]);
+			return Promise.all([self.registration.pushManager.getSubscription(), notiEventHandler('push', payload.push_srl, eventObj), notiStore.get('config')]);
 		}).then(function(retData) {
 			var subscription = retData[0];
+			var pushMessageType = retData[2] && retData[2].pushMessageType || "push";
 			if(!subscription) {
 				throw new Error('PushManager: Can\'t get endpoint info.');
 			}
@@ -148,66 +149,96 @@ self.addEventListener('push', function(event) {
 				}
 			});
 
-			return registration.getNotifications({}).then(function(notifications) {
+			return clients.matchAll({
+				type: "window",
+				includeUncontrolled: true
+			}).then(function(clientList){
 
-				var prevNotificationInfo = notifications.filter(function(notification) {
-					var split = notification.tag ? notification.tag.split('@') : null;
-					return notification.tag && notification.data && notification.data.__sw && (notification.tag == tag || (split && split.length && split[0] == tag) );
-				}).sort(function(a, b){
-					return a.data.__sw.timestamp - b.data.__sw.timestamp;
-				}).reduce(function(val, current, idx, arr){
-					var data = current.data;
-					var __sw = data ? data.__sw : null;
-					var removed = false;
-					if(__sw) {
-						if(arr.length-val.removeCount >= maxNotificationCount) {
-							current.close();
-							removed = true;
-							val.removeCount++;
-						}
-
-						if(__sw.notReadedMessageCount) {
-							val.notReadedMessageMaxCount = Math.max(val.notReadedMessageMaxCount, __sw.notReadedMessageCount);
-						} else if(!removed) {
-							val.nonCountNotification++;
-						}
-					}
-
-					return val;
-				}, {
-					notReadedMessageMaxCount: 0,
-					nonCountNotification: 0,
-					removeCount: 0
+				var targetClient = clientList.find(function(eachClient){
+					return eachClient.focused && eachClient.visibilityState === "visible";
 				});
-
-				var notificationBody = body;
-				var notificationTag = maxNotificationCount > 1 ? tag + "@" + Date.now() + "." + Math.random().toString(36).substr(2) : tag;
-				sw.notReadedMessageCount = (prevNotificationInfo.notReadedMessageMaxCount ? prevNotificationInfo.notReadedMessageMaxCount : prevNotificationInfo.nonCountNotification) + prevNotificationInfo.removeCount;
-				sw.pushTimestamp = timestamp;
-				if(sw.notReadedMessageCount > 0 && useCountSummary && countSummaryTemplate && body) {
-					notificationBody = countSummaryTemplate.replace('[@content_summary]', body.substring(0, 45));
-					notificationBody = notificationBody.replace('[@count]', sw.notReadedMessageCount);
+				if(targetClient && (pushMessageType === "mix" || pushMessageType === "both")) {
+					targetClient.postMessage({
+						name: 'push',
+						type: payload.type,
+						pushSrl: payload.push_srl || 0,
+						title: title,
+						body: body,
+						icon: icon,
+						image: image,
+						launchUrl: payload.launchUrl || null,
+						timestamp: timestamp,
+					});
 				}
-				var notificationOptions = {
-					actions: actions,
-					body: notificationBody,
-					icon: icon,
-					data: notificationData,
-					image: image,
-					badge: badge,
-					requireInteraction: requireInteraction,
-					silent: silent,
-					renotify: renotify,
-					tag: notificationTag
-				};
-				Object.keys(notificationOptions).forEach(function(eachKey){
-					if(notificationOptions[eachKey] === null || notificationOptions[eachKey] === void 0) {
-						delete(notificationOptions[eachKey]);
-					}
-				});
 
-				return self.registration.showNotification(title, notificationOptions);
+				if(pushMessageType === "both" ||
+					((pushMessageType === "push_without_focus" || pushMessageType === "mix") && !targetClient) ||
+					pushMessageType === "push"
+				) {
+					return registration.getNotifications({}).then(function(notifications) {
+						var prevNotificationInfo = notifications.filter(function(notification) {
+							var split = notification.tag ? notification.tag.split('@') : null;
+							return notification.tag && notification.data && notification.data.__sw && (notification.tag == tag || (split && split.length && split[0] == tag) );
+						}).sort(function(a, b){
+							return a.data.__sw.timestamp - b.data.__sw.timestamp;
+						}).reduce(function(val, current, idx, arr){
+							var data = current.data;
+							var __sw = data ? data.__sw : null;
+							var removed = false;
+							if(__sw) {
+								if(arr.length-val.removeCount >= maxNotificationCount) {
+									current.close();
+									removed = true;
+									val.removeCount++;
+								}
+
+								if(__sw.notReadedMessageCount) {
+									val.notReadedMessageMaxCount = Math.max(val.notReadedMessageMaxCount, __sw.notReadedMessageCount);
+								} else if(!removed) {
+									val.nonCountNotification++;
+								}
+							}
+
+							return val;
+						}, {
+							notReadedMessageMaxCount: 0,
+							nonCountNotification: 0,
+							removeCount: 0
+						});
+
+						var notificationBody = body;
+						var notificationTag = maxNotificationCount > 1 ? tag + "@" + Date.now() + "." + Math.random().toString(36).substr(2) : tag;
+						sw.notReadedMessageCount = (prevNotificationInfo.notReadedMessageMaxCount ? prevNotificationInfo.notReadedMessageMaxCount : prevNotificationInfo.nonCountNotification) + prevNotificationInfo.removeCount;
+						sw.pushTimestamp = timestamp;
+						if(sw.notReadedMessageCount > 0 && useCountSummary && countSummaryTemplate && body) {
+							notificationBody = countSummaryTemplate.replace('[@content_summary]', body.substring(0, 45));
+							notificationBody = notificationBody.replace('[@count]', sw.notReadedMessageCount);
+						}
+						var notificationOptions = {
+							actions: actions,
+							body: notificationBody,
+							icon: icon,
+							data: notificationData,
+							image: image,
+							badge: badge,
+							requireInteraction: requireInteraction,
+							silent: silent,
+							renotify: renotify,
+							tag: notificationTag
+						};
+						Object.keys(notificationOptions).forEach(function(eachKey){
+							if(notificationOptions[eachKey] === null || notificationOptions[eachKey] === void 0) {
+								delete(notificationOptions[eachKey]);
+							}
+						});
+
+						return self.registration.showNotification(title, notificationOptions);
+					})
+				}
+
+				return Promise.resolve();
 			});
+
 
 		}).catch(function(e) {
 			console.error(e);

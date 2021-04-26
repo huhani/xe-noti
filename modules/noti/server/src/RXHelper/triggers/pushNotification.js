@@ -26,7 +26,7 @@ var pushNotification = function() {
             return always(notiController.send(endpoint.endpoint, endpoint.key, endpoint.auth, endpoint.supportedEncoding, payload)).then(function(response){
                 var promiseList = [
                     notiController.insertPushLog(sequence, endpoint.endpoint_srl, data, payload, response),
-                    notiController.endpointSendCountUp(endpoint.endpoint_srl)
+                    notiController.endpointSendCountUp(endpoint.endpoint_srl, !(response instanceof webPush.WebPushError) && response instanceof Error)
                 ];
                 if(response instanceof webPush.WebPushError && (response.statusCode === 404 || response.statusCode === 410)) {
                     promiseList.push(notiController.removeEndpoint(endpoint.endpoint));
@@ -36,7 +36,6 @@ var pushNotification = function() {
 
                 return always(Promise.all(promiseList));
             });
-
         }).then(function() {
             that.resolve();
         })['catch'](function(err) {

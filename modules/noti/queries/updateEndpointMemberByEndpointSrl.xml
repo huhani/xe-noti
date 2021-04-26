@@ -13,6 +13,7 @@
 		<column name="user_agent" var="user_agent" />
 		<column name="browser" var="browser" />
 		<column name="platform" var="platform" />
+		<column name="client_details" var="client_details" />
 		<column name="last_update" var="last_update" notnull="notnull" />
 	</columns>
 	<conditions>

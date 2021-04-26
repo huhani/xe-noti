@@ -167,6 +167,7 @@ class notiAdminController extends noti
 	    $nick_name = $loggedInfo->nick_name;
 	    $ipaddress = $_SERVER['REMOTE_ADDR'];
 	    $target_member_srls = Context::get('target_member_srls');
+	    $target_device = Context::get('target_device');
 	    $type = Context::get('type');
 	    $title = Context::get('title');
 	    $content = Context::get('content');
@@ -186,6 +187,7 @@ class notiAdminController extends noti
 	    $obj->member_srl = $member_srl;
 	    $obj->nick_name =$nick_name;
 	    $obj->ipaddress = $ipaddress;
+	    $obj->target_device = $target_device;
 	    $obj->type = $type;
 	    $obj->title = $title;
 	    $obj->content = $content;
@@ -356,6 +358,30 @@ class notiAdminController extends noti
         $this->setRedirectUrl($returnUrl);
     }
 
+    function procNotiAdminPushTest() {
+	    $logged_info = Context::get('logged_info');
+	    $endpoint_srl = Context::get('endpoint_srl');
+	    $oNotiModel = getModel('noti');
+	    $oNotiController = getController('noti');
+	    $endpointInfo = $oNotiModel->getEndpoint($endpoint_srl);
+	    if(!$endpointInfo) {
+	        return new BaseObject(-1, "단말기 정보를 찾을 수 없습니다.");
+        }
+
+        $endpointArgs = new stdClass();
+        $endpointArgs->endpoint_srl = (int)$endpointInfo->endpoint_srl;
+        $endpointArgs->endpoint = $endpointInfo->endpoint;
+        $endpointArgs->key = $endpointInfo->key;
+        $endpointArgs->auth = $endpointInfo->auth;
+        $endpointArgs->supportedEncoding = explode(",", $endpointInfo->supported_encoding);
+        
+	    $memberInfo = new stdClass();
+	    $memberInfo->member_srl = $logged_info->member_srl;
+	    $memberInfo->nick_name = $logged_info->nick_name;
+
+        $oNotiController->sendTestMessage($memberInfo, $endpointArgs);
+    }
+
     function procNotiAdminPushLogDeleteByOptions() {
 	    $oNotiController = getController('noti');
 	    $type = Context::get('target_name');
@@ -396,6 +422,26 @@ class notiAdminController extends noti
         return $output;
     }
 
+    function procNotiAdminSkinConfig() {
+        $oModuleController = getController('module');
+        $oModuleModel = getModel('module');
+        $notiInfo = $oModuleModel->getModuleInfoByMid('noti');
+        if($notiInfo){
+            $notiInfo->skin = Context::get('skin');
+            $notiInfo->mskin = Context::get('mskin');
+            $notiInfo->layout_srl = Context::get('layout_srl');
+            $notiInfo->mlayout_srl = Context::get('mlayout_srl');
+            $notiInfo->use_mobile = Context::get('use_mobile') === "Y" ? "Y" : "N";
+
+            $oModuleController->updateModule($notiInfo);
+        }
+
+        $this->setMessage('success_saved');
+
+        $returnUrl = Context::get('success_return_url') ? Context::get('success_return_url') : getNotEncodedUrl('', 'module', 'admin', 'act', 'dispNotiAdminSkinConfig');
+        $this->setRedirectUrl($returnUrl);
+    }
+
     private function getValidImageRules($text = "") {
 	    $text = is_string($text) ? $text : "";
 	    $split = explode(";", $text);
@@ -434,9 +480,9 @@ class notiAdminController extends noti
     }
 
     private function configObjectRecursion(&$vars, &$before) {
-	    $boolKeys = array('use', 'tryinsertIfLogin', 'tryinsertIfAutologin', 'allowDebugPage', 'pushEventPassThrough',
-            'allowInsert', 'sendInsertNotice', 'silent', 'requireInteraction', 'renotify', 'sendDeniedMember');
-	    $intKeys = array('ttl', 'thumbnailWidth', 'thumbnailHeight', 'pushGroupSrl');
+	    $boolKeys = array('use', 'simpleConfig', 'tryinsertIfLogin', 'tryinsertIfAutologin', 'allowDebugPage', 'memberToGuest',
+            'allowInsert', 'sendInsertNotice', 'silent', 'requireInteraction', 'renotify', 'sendDeniedMember', 'addMemberMenu');
+	    $intKeys = array('ttl', 'thumbnailWidth', 'thumbnailHeight', 'pushGroupSrl', 'browserPushLogMaxCount');
 	    $__arrType = null;
 	    foreach($before as $key=>$val) {
             if(!array_key_exists ($key, $vars) || (is_array($val) && !is_array($vars[$key]))) {

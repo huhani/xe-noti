@@ -15,10 +15,29 @@ class notiController extends noti
 	function init(){
 	}
 
+	function createNotiMid() {
+        $oModuleModel = getModel('module');
+        $oModuleController = getController('module');
+        $notiInfo = $oModuleModel->getModuleInfoByMid('noti');
+        if(!$notiInfo->module_srl) {
+            $args = new stdClass();
+            $args->mid = 'noti';
+            $args->module = 'noti';
+            $args->browser_title = '푸시 알림';
+            $args->site_srl = 0;
+            $args->skin = '/USE_DEFAULT/';
+            $args->mskin = '/USE_DEFAULT/';
+            $args->layout_srl = -1;
+            $args->mlayout_srl = -1;
+            $args->use_mobile = "N";
+            $oModuleController->insertModule($args);
+        }
+    }
+
 	function triggerDeleteMember($obj) {
 		$member_srl = $obj->member_srl;
 		if($member_srl) {
-			$this->deleteNotiAllInfoByMemberSrl($member_srl);
+			$this->deleteDeviceByMemberSrl($member_srl);
 		}
 
 		return new BaseObject();
@@ -38,7 +57,7 @@ class notiController extends noti
 		$oNotiModel = getModel('noti');
 		$module_config = $oNotiModel->getConfig();
         $keep_signed = Context::get('keep_signed') === "Y";
-        if(!$module_config['use'] || !$oNotiModel->isConfigFulfilled() ||!((!$keep_signed && $module_config['tryinsertIfLogin']) || ($keep_signed && $module_config['tryinsertIfAutologin'])) ) {
+        if(!$oNotiModel->isSupportedBrowser() || !$module_config['use'] || !$oNotiModel->isConfigFulfilled() ||!((!$keep_signed && $module_config['tryinsertIfLogin']) || ($keep_signed && $module_config['tryinsertIfAutologin'])) ) {
             return new BaseObject();
         }
 		if(isset($obj->member_srl) && $obj->member_srl > 0) {
@@ -50,13 +69,14 @@ class notiController extends noti
 
 	function triggerAfterDoLogout(&$obj) {
         $isHTTPS = false;
+        $oNotiModel = getModel('noti');
         if(array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === "https") {
             $isHTTPS = true;
         }
         if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === "on") {
             $isHTTPS = true;
         }
-        if(!$isHTTPS) {
+        if(!$oNotiModel->isSupportedBrowser() || !$isHTTPS) {
             return new BaseObject();
         }
 
@@ -78,20 +98,25 @@ class notiController extends noti
 		}
 		if (Context::getResponseMethod() == 'HTML') {
 			Context::addHtmlHeader('<link rel="manifest" href="/manifest.json">');
+            Context::loadFile($this->module_path . 'tpl/css/messenger/messenger.min.css');
+            Context::loadFile($this->module_path . 'tpl/css/messenger/theme/air.min.css');
             Context::loadFile($this->module_path . 'tpl/js/NotiStore.js', 'body');
+            Context::loadFile($this->module_path . 'tpl/js/messenger.min.js', 'body');
             Context::loadFile($this->module_path . 'tpl/js/base.js', 'body');
 
-			$logged_info = Context::get('logged_info');
-			if($logged_info) {
-				if($_SESSION['__noti__']['afterLogin']) {
-					Context::loadFile($this->module_path . 'tpl/js/login.js', 'body');
-					unset($_SESSION['__noti__']['afterLogin']);
-				}
-			}
+            if($oNotiModel->isSupportedBrowser()) {
+                $logged_info = Context::get('logged_info');
+                if($logged_info) {
+                    if($_SESSION['__noti__']['afterLogin']) {
+                        Context::loadFile($this->module_path . 'tpl/js/login.js', 'body');
+                        unset($_SESSION['__noti__']['afterLogin']);
+                    }
+                }
 
-            if(isset($_COOKIE['__notiLogout__'])) {
-                Context::loadFile($this->module_path . 'tpl/js/logout.js', 'body');
-                setcookie("__notiLogout__", null, -1);
+                if(isset($_COOKIE['__notiLogout__'])) {
+                    Context::loadFile($this->module_path . 'tpl/js/logout.js', 'body');
+                    setcookie("__notiLogout__", null, -1);
+                }
             }
 		}
 
@@ -101,20 +126,14 @@ class notiController extends noti
 	}
 
 	function triggerBeforeModuleInit($obj) {
-        return new BaseObject();
-
-		if(!Context::get('is_logged')){
-			return new BaseObject();
-		}
-
+		$isLogged = Context::get('is_logged');
 		$oNotiModel = getModel('noti');
-		$module_config = $oNotiModel->getConfig();
-
-		if($module_config->show_member_menu === "Y"){
+		$moduleConfig = $oNotiModel->getConfig();
+		if($oNotiModel->isSupportedBrowser() && $moduleConfig['addMemberMenu'] && ($isLogged || (!$isLogged && $moduleConfig['MemberPush']['allowInsert']))){
 			Context::loadLang('./modules/noti/lang/lang.xml');
 
 			$oMemberController = getController('member');
-			$oMemberController->addMemberMenu('dispNotiDeviceList', 'cmd_noti_config');
+			$oMemberController->addMemberMenu('dispNotiEndpointSubscribe', 'cmd_noti_config');
 		}
 
 		return new BaseObject();
@@ -128,7 +147,6 @@ class notiController extends noti
 	    $oNotiModel = getModel('noti');
 
     }
-
 
     function triggerNcenterliteInsertNotify(&$obj)  {
         $oNotiModel = getModel('noti');
@@ -196,6 +214,7 @@ class notiController extends noti
         $logged_info = Context::get('logged_info');
         $endpoint = Context::get('endpoint');
         $supported_encoding = Context::get("contentEncoding");
+        $client_details = Context::get("clientDetails");
         $ipaddress = $_SERVER['REMOTE_ADDR'];
 
         if(!$endpoint || !$oNotiModel->isVaildEndpoint($endpoint)) {
@@ -220,7 +239,11 @@ class notiController extends noti
         $oEndpointInfo = $oNotiModel->getNotiEndpointByCRC32($endpoint);
         // 비회원 상태에서 등록한 알림이라면 자동로그인시 해당 계정 정보로 업데이트
         // 회원이라면 그냥 에러뿜꼬 끝내기.
-
+        $client_details = @base64_decode($client_details);
+        if(!$client_details || !@json_decode($client_details) || strlen($client_details > 65535)) {
+            // 관리자 페이지에서 표시할때 필히 보안에 신경써야 함!
+            $client_details = null;
+        }
 
         $args = new stdClass();
         $args->member_srl = $member_srl;
@@ -230,6 +253,7 @@ class notiController extends noti
         $args->key = Context::get("key");
         $args->auth = Context::get("auth");
         $args->supported_encoding = $supported_encoding_list;
+        $args->client_details = $client_details;
         $endpoint_srl = !$oEndpointInfo ? $this->insertDevice($args) : $this->updateDevice($oEndpointInfo->endpoint_srl, $args);
         if($endpoint_srl !== -1) {
             $endpointData = new stdClass();
@@ -263,6 +287,7 @@ class notiController extends noti
     function procNotiServiceWorkerEvent() {
 	    $oNotiModel  = getModel('noti');
 	    $eventName = Context::get('eventName');
+	    $endpoint = Context::get('endpoint');
         $endpoint_srl = Context::get('endpoint_srl');
         $push_srl = Context::get('push_srl');
 
@@ -270,10 +295,9 @@ class notiController extends noti
         Context::setResponseMethod('JSON');
         if($eventName) {
             switch($eventName) {
-
                 case 'push':
                     $pushData = $push_srl ? $oNotiModel->getPushLog($push_srl) : null;
-                    if($push_srl && $pushData && $pushData->endpoint_srl == $endpoint_srl) {
+                    if($push_srl && $pushData && $pushData->endpoint_srl == $endpoint_srl && $pushData->endpoint && $pushData->endpoint === $endpoint) {
                         $this->setPushReaded($push_srl);
                         $this->updateEndpointLastRead($endpoint_srl);
                     }
@@ -281,14 +305,14 @@ class notiController extends noti
 
                 case 'notificationclick':
                     $pushData = $push_srl ? $oNotiModel->getPushLog($push_srl) : null;
-                    if($push_srl && $pushData && $pushData->endpoint_srl == $endpoint_srl) {
+                    if($push_srl && $pushData && $pushData->endpoint_srl == $endpoint_srl && $pushData->endpoint && $pushData->endpoint === $endpoint) {
                         $this->setPushClicked($push_srl);
                         $this->updateEndpointLastClick($endpoint_srl);
                     }
                     break;
             }
         }
-        
+
         $this->add('message', 'success');
         $this->add('error', 0);
     }
@@ -326,11 +350,34 @@ class notiController extends noti
 
     }
 
+    function procNotiPushTest() {
+        $oNotiModel = getModel('noti');
+	    $loggedInfo = Context::get('logged_info');
+	    $endpoint = Context::get('endpoint');
+	    $endpoint_srl = Context::get('endpoint_srl');
+	    $endpointInfo = $oNotiModel->getEndpoint($endpoint_srl);
+	    if($endpointInfo && $endpointInfo->endpoint === $endpoint) {
+            $endpointArgs = new stdClass();
+            $endpointArgs->endpoint_srl = (int)$endpointInfo->endpoint_srl;
+            $endpointArgs->endpoint = $endpointInfo->endpoint;
+            $endpointArgs->key = $endpointInfo->key;
+            $endpointArgs->auth = $endpointInfo->auth;
+            $endpointArgs->supportedEncoding = explode(",", $endpointInfo->supported_encoding);
+
+	        $this->sendTestMessage($loggedInfo, $endpointArgs);
+        } else if(!$endpointInfo) {
+            $this->setError(-1, "단말기 정보를 가져올 수 없습니다.");
+        } else {
+            $this->setError(-1, "올바르지 않은 단말기 정보입니다.");
+        }
+    }
+
     function insertDevice($obj) {
 	    $member_srl = (int)$this->getDefault($obj, "member_srl", 0);
 	    $nick_name = $this->getDefault($obj, "nick_name", "unknown");
 	    $ipaddress = $this->getDefault($obj, "ipaddress", $_SERVER["REMOTE_ADDR"]);
 	    $user_agent = $this->getDefault($obj, "user_agent", $_SERVER["HTTP_USER_AGENT"]);
+	    $client_details = $this->getDefault($obj, "client_details", null);
 	    $key = $this->getDefault($obj, "key", null);
 	    $auth = $this->getDefault($obj, "auth", null);
 	    $supported_encoding = $this->getDefault($obj, "supported_encoding", []);
@@ -351,6 +398,7 @@ class notiController extends noti
         $args->user_agent = $user_agent;
         $args->browser = $browser;
         $args->platform = $platform;
+        $args->client_details = $client_details;
         $args->endpoint_crc32 = $endpoint_crc32;
         $args->endpoint = $endpoint;
         $args->auth = $auth;
@@ -374,7 +422,8 @@ class notiController extends noti
 	    $args->member_srl = isset($obj->member_srl) ? $obj->member_srl : 0;
 	    $args->nick_name = isset($obj->nick_name) ? $obj->nick_name : "unknown";
 	    $args->ipaddress = isset($obj->ipaddress) ? $obj->ipaddress : $_SERVER['REMOTE_ADDR'];
-        $args->type = $obj->type; // public or private
+        $args->target_device = $obj->target_device; // public or private
+        $args->type = isset($obj->type) ? $obj->type : null;
 	    $args->title = $obj->title;
 	    $args->content = $obj->content;
 	    $args->action = null;
@@ -470,6 +519,7 @@ class notiController extends noti
         $args->user_agent = $obj && isset($obj->user_agent) ? $obj->user_agent : null;
         $args->browser = $obj && isset($obj->browser) ? $obj->browser : null;
         $args->platform = $obj && isset($obj->platform) ? $obj->platform : null;
+        $args->client_details = $obj && isset($obj->client_details) ? $obj->client_details : null;
         $args->last_update = date("YmdHis");
         $output = executeQuery('noti.updateEndpointMemberByEndpointSrl', $args);
 
@@ -497,6 +547,14 @@ class notiController extends noti
         return $this->sendToMessageQueue(array($pushData));
     }
 
+    function sendTestMessage($memberInfo, $endpointInfo) {
+        $oNotiModel = getModel('noti');
+        $data = $oNotiModel->getTestPush($memberInfo);
+        $pushData = $this->getPushDataFormat($data, $endpointInfo);
+
+        return $this->sendToMessageQueue(array($pushData));
+    }
+
     function sendManualPush($obj, $targetMemberSrls = [], $targetEndpointSrls = null) {
 	    if($obj->type === "private" && (!$targetMemberSrls || !is_array($targetMemberSrls)) && (!$targetEndpointSrls || !is_array($targetEndpointSrls))) {
 	        return new BaseObject(-1, '푸시를 전송 할 대상이 지정되지 않았습니다.');
@@ -514,7 +572,12 @@ class notiController extends noti
 	    $defaultWebPushConfig = $oNotiModel->getWebPushDefaultOption();
 	    $pushGroup = $oNotiModel->getPushGroup($obj->push_group_srl);
 
+	    $payloadType = new stdClass();
+	    $payloadType->name = "manual";
+	    $payloadType->text = isset($obj->type) ? $obj->type : null;
+
 	    $payload = new stdClass();
+	    $payload->type = $payloadType;
 	    $payload->title = $obj->title;
 	    $payload->body = isset($obj->content) && $obj->content ? $obj->content : null;
 	    $payload->launchUrl = isset($obj->target_url) && $obj->target_url ? $obj->target_url : null;
@@ -536,7 +599,7 @@ class notiController extends noti
 	    $data->targetMemberSrls = $targetMemberSrls;
 	    $data->targetEndpointSrls = $targetEndpointSrls;
 	    $data->manualPushSrl = $manualPushSrl;
-	    $data->type = $obj->type;
+	    $data->targetDevice = $obj->target_device;
 	    $data->payload = $payload;
 	    $data->sendCount = isset($obj->send_count) && is_numeric($obj->send_count) ? $obj->send_count : 1;
 

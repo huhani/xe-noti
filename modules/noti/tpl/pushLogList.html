@@ -96,6 +96,8 @@
                     기타
                     <!--@else if($list->type === "manual")-->
                     수동
+                    <!--@else if($list->type === "test")-->
+                    테스트
                     <!--@end-->
                 </a>
             </td>
@@ -210,14 +212,14 @@
         <option value="sender_nick_name_now" selected="selected"|cond="$search_target == 'sender_nick_name_now'">발신자 닉네임 (현재)</option>
         <option value="sender_member_srl" selected="selected"|cond="$search_target == 'sender_member_srl'">발신자 회원번호</option>
         <option value="endpoint_srl" selected="selected"|cond="$search_target == 'endpoint_srl'">단말기 ID</option>
-        <option value="document_srl" selected="selected"|cond="$search_target == 'document_srl'">문서번호</option>
-        <option value="target_srl" selected="selected"|cond="$search_target == 'target_srl'">대상번호</option>
+        <option value="document_srl" selected="selected"|cond="$search_target == 'document_srl'" cond="!$notiConfig['simpleConfig']">문서번호</option>
+        <option value="target_srl" selected="selected"|cond="$search_target == 'target_srl'" cond="!$notiConfig['simpleConfig']">대상번호</option>
         <option value="type" selected="selected"|cond="$search_target == 'type'">종류</option>
         <option value="content_summary" selected="selected"|cond="$search_target == 'content_summary'">알림내용</option>
-        <option value="push_payload" selected="selected"|cond="$search_target == 'push_payload'">Payload</option>
-        <option value="status_code" selected="selected"|cond="$search_target == 'status_code'">StatusCode</option>
+        <option value="push_payload" selected="selected"|cond="$search_target == 'push_payload'" cond="!$notiConfig['simpleConfig']">Payload</option>
+        <option value="status_code" selected="selected"|cond="$search_target == 'status_code'" cond="!$notiConfig['simpleConfig']">StatusCode</option>
         <option value="target_url" selected="selected"|cond="$search_target == 'target_url'">URL</option>
-        <option value="ipaddress" selected="selected"|cond="$search_target == 'ipaddress'">IP주소</option>
+        <option value="ipaddress" selected="selected"|cond="$search_target == 'ipaddress'" cond="!$notiConfig['simpleConfig']">IP주소</option>
         <option value="regdate" selected="selected"|cond="$search_target == 'regdate'">등록일</option>
     </select>
     <input type="search" name="search_keyword" value="{htmlspecialchars($search_keyword, ENT_COMPAT | ENT_HTML401, 'UTF-8', false)}" title="{$lang->cmd_search}" />

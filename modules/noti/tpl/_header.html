@@ -25,7 +25,7 @@ $endpointMenu = array('dispNotiAdminEndpointList', 'dispNotiAdminEndpointView');
 	<li class="x_active"|cond="in_array($act, $manualPushMenu)">
 		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminManualPushList')}">수동 전송</a>
 	</li>
-	<li class="x_active"|cond="in_array($act, $pushGroupMenu)">
+	<li class="x_active"|cond="in_array($act, $pushGroupMenu)" cond="$showPushGroupMenu">
 		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminPushGroupList')}">알림 그룹</a>
 	</li>
 	<li class="x_active"|cond="in_array($act, $endpointMenu)">
@@ -37,6 +37,10 @@ $endpointMenu = array('dispNotiAdminEndpointList', 'dispNotiAdminEndpointView');
 
 	<li class="x_active"|cond="$act == 'dispNotiAdminInspectView'">
 		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminInspectView')}">점검</a>
+	</li>
+
+	<li class="x_active"|cond="$act == 'dispNotiAdminSkinConfig'">
+		<a href="{getUrl('', 'module', $module, 'act', 'dispNotiAdminSkinConfig')}">스킨 설정</a>
 	</li>
 
 </ul>

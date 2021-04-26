@@ -9,20 +9,52 @@
 class notiView extends noti {
 
 	function init() {
-		$noti_config = $this->module_config;
-		Context::set('module_config', $noti_config);
-		$template_path = sprintf("%sskins/default",$this->module_path);
 
-		$this->setTemplatePath($template_path);
+        $oModuleModel = getModel('module');
+        $notiInfo = $oModuleModel->getModuleInfoByMid('noti');
+        $this->module_info = $notiInfo;
+
+        $template_path = sprintf("%sskins/%s/", $this->module_path, $this->module_info->skin);
+        $this->module_info->layout_srl = $this->module_info->layout_srl;
+        if(!is_dir($template_path)||!$this->module_info->skin) {
+            $this->module_info->skin = 'default';
+            $template_path = sprintf("%sskins/%s/",$this->module_path, $this->module_info->skin);
+        }
+        $this->setTemplatePath($template_path);
 	}
 
 
-	function dispNotiDeviceList() {
+	function dispNotiEndpointSubscribe() {
+        $isHTTPS = false;
+        if(array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === "https") {
+            $isHTTPS = true;
+        }
+        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === "on") {
+            $isHTTPS = true;
+        }
+        if(!$isHTTPS) {
+            return new BaseObject(-1, "HTTPS 환경에서만 알림 사용이 가능합니다.");
+        }
 
-        Context::loadFile(array('./modules/noti/tpl/js/base.js', 'head', '', null), true);
+        $oNotiModel = getModel('noti');
+        $notiConfig = $oNotiModel->getConfig();
+        Context::set('notiConfig', $notiConfig);
 
-		$this->setTemplateFile('member_dev');
+		$this->setTemplateFile('endpointSubscribe');
 	}
+
+	function dispNotiEndpointDebug() {
+
+	    $oNotiModel = getModel('noti');
+	    $notiConfig = $oNotiModel->getConfig();
+
+	    Context::set('notiConfig', $notiConfig);
+	    Context::set('serverID', $oNotiModel->getServerID());
+	    Context::set('isConfigFulfilled', $oNotiModel->isConfigFulfilled());
+
+
+        $this->setTemplateFile('endpointDebug');
+    }
 
 }
 

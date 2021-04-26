@@ -11,6 +11,12 @@
     <input type="hidden" name="success_return_url" value="{getUrl('', 'module', 'admin', 'act', 'dispNotiAdminNcenterliteConfig')}">
 
 
+    <style cond="$notiConfig['simpleConfig']">
+        .x_control-group.noti-detail-config {
+            display:none;
+        }
+    </style>
+
     <section class="section">
         <h1>전체<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
         <div class="x_control-group">
@@ -26,7 +32,7 @@
             </div>
         </div>
 
-        <div class="x_control-group" for="ncenterlite_defaultProfileIamge">
+        <div class="x_control-group noti-detail-config" for="ncenterlite_defaultProfileIamge">
             <label class="x_control-label">@profile_image 기본값</label>
             <div class="x_controls">
                 <input type="text" value="{$ncenterliteConfig['defaultProfileImage']}" name="ncenterlite[defaultProfileImage]" id="ncenterlite_defaultProfileIamge" style="width:350px;">
@@ -36,7 +42,7 @@
             </div>
         </div>
 
-        <div class="x_control-group" for="ncenterlite_defaultIamge">
+        <div class="x_control-group noti-detail-config" for="ncenterlite_defaultIamge">
             <label class="x_control-label">@image 기본값</label>
             <div class="x_controls">
                 <input type="text" value="{$ncenterliteConfig['defaultImage']}" name="ncenterlite[defaultImage]" id="ncenterlite_defaultIamge" style="width:350px;">
@@ -45,7 +51,7 @@
                 <p id="ncenterlite_defaultIamge_help" class="x_help-block" hidden="hidden">@image에 대한 기본값을 입력합니다. 섬네일이 없는 알림일 경우 이 설정값을 참조하여 이미지를 출력합니다.</p>
             </div>
         </div>
-        <div class="x_control-group" for="ncenterlite_defaultImageType">
+        <div class="x_control-group noti-detail-config" for="ncenterlite_defaultImageType">
             <label class="x_control-label">@image 대상 이미지</label>
             <div class="x_controls">
                 <input type="text" value="{implode(';', $ncenterliteConfig['defaultImageType'])}" name="ncenterlite[defaultImageType]" id="ncenterlite_defaultImageType" style="width:350px;">
@@ -63,11 +69,17 @@
 
     </section>
 
+    <block loop="$ncenterliteTypeList => $each">
 
-    <block loop="$ncenterliteConfig['types'] => $key,$val">
+        {@
+            $name = $each[0];
+            $key = $each[1];
+            $val = $ncenterliteConfig['types'][$key];
+        }
+
 
         <section class="section">
-            <h1>{$val['name']}<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
+            <h1>{$name}<button type="button" class="snToggle x_icon-chevron-up">Toggle this section</button></h1>
 
 
             <div class="x_control-group">
@@ -83,7 +95,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_title" class="x_control-label">알림 제목</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_title">
@@ -94,18 +106,21 @@
             </div>
 
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_body" class="x_control-label">알림 내용</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_body">
                         <textarea name="ncenterlite[types][{$key}][body]" id="ncenterlite_{$key}_body" rows="3" style="width:450px;">{$val['body']}</textarea>
                     </label>
                     <a href="#ncenterlite_{$key}_body_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_body_help">{$lang->help}</a>
-                    <p id="ncenterlite_{$key}_body_help" class="x_help-block" hidden="hidden">알림에 표시할 내용을 입력합니다. 기본값 : #[@nick_name] [@content_summary]</p>
+                    <p id="ncenterlite_{$key}_body_help" class="x_help-block" hidden="hidden">알림에 표시할 내용을 입력합니다. 기본값 : #[@nick_name] [@content_summary]<BR>
+                        [@nick_name] : 발신인 닉네임<BR>
+                        [@content_summary] : 내용 요약본 (글, 댓글 내용)
+                    </p>
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_launchUrl" class="x_control-label">이동 URL</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_launchUrl">
@@ -115,18 +130,19 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_icon" class="x_control-label">알림 아이콘</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_icon">
                         <input type="text" value="{$val['icon']}" name="ncenterlite[types][{$key}][icon]" id="ncenterlite_{$key}_icon" style="width:450px;"></label>
                     <a href="#ncenterlite_{$key}_icon_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_icon_help">{$lang->help}</a>
                     <p id="ncenterlite_{$key}_icon_help" class="x_help-block" hidden="hidden">알림 아이콘으로 사용하 이미지 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 아이콘을 출력하지 않습니다.<BR>
-                    기본값 : [@profile_image}</p>
+                    기본값 : [@profile_image] <BR>
+                        [@profile_image]은 발신인의 프로필 사진을 의미합니다.</p>
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_image" class="x_control-label">알림 이미지</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_image">
@@ -134,12 +150,13 @@
                     <a href="#ncenterlite_{$key}_image_help" class="x_icon-question-sign" data-toggle="#ncenterlite_{$key}_image_help">{$lang->help}</a>
                     <p id="ncenterlite_{$key}_image_help" class="x_help-block" hidden="hidden">알림에 사용될 2:1(가로:세로) 비율의 이미지의 URL(jpg, png)를 입력합니다. 입력하지 않을 경우 이미지를 출력하지 않습니다.
                     <BR>
-                        기본값 : [@image] (게시글만 해당)
+                        기본값 : [@image] (게시글만 해당)<BR>
+                        [@image]는 해당 게시글에 첨부된 이미지 파일을 가져옵니다.
                     </p>
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_action1" class="x_control-label">알림 ACTION 1</label>
                 <div class="x_controls">
                     <div>
@@ -181,7 +198,7 @@
             </div>
 
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_action2" class="x_control-label">알림 ACTION 2</label>
                 <div class="x_controls">
                     <div>
@@ -222,7 +239,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_action1" class="x_control-label">알림 ACTION 3</label>
                 <div class="x_controls">
                     <div>
@@ -266,7 +283,7 @@
 
 
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_badge" class="x_control-label">뱃지 아이콘 URL</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_badge">
@@ -276,7 +293,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label class="x_control-label">고요 모드</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_use_silent">
@@ -289,7 +306,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label class="x_control-label">RequireInteraction</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_use_requireinteraction">
@@ -302,7 +319,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label class="x_control-label">재알림</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_use_renotify">
@@ -315,7 +332,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label class="x_control-label">수명 (TTL)</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_ttl">
@@ -326,7 +343,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label class="x_control-label">알림 우선순위</label>
                 <div class="x_controls">
                     <label class="x_inline" for="ncenterlite_{$key}_urgency_very-low">
@@ -352,7 +369,7 @@
                 </div>
             </div>
 
-            <div class="x_control-group">
+            <div class="x_control-group noti-detail-config">
                 <label for="ncenterlite_{$key}_push_group" class="x_control-label">푸시 그룹</label>
                 <div class="x_controls">
 

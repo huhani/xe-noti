@@ -25,6 +25,8 @@ class noti extends ModuleObject
 	{
 		$oModuleModel = getModel('module');
 		$oModuleController = getController('module');
+		$oNotiController = getController('noti');
+		$oNotiController->createNotiMid();
 
         foreach ($this->triggers as $trigger)
         {
@@ -48,6 +50,15 @@ class noti extends ModuleObject
 			$oModuleController->deleteTrigger($trigger[0], $trigger[1], $trigger[2], $trigger[3], $trigger[4]);
 		}
 
+        //페이지 삭제
+        $notiInfo = $oModuleModel->getModuleInfoByMid('noti');
+        if($notiInfo->module_srl) {
+            $output = $oModuleController->deleteModule($notiInfo->module_srl);
+            if(!$output->toBool()) {
+                return $output;
+            }
+        }
+
 		return new BaseObject();
 
 	}
@@ -68,9 +79,10 @@ class noti extends ModuleObject
 
 	function moduleUpdate()
 	{
-
 		$oModuleModel = getModel('module');
 		$oModuleController = getController('module');
+        $oNotiController = getController('noti');
+        $oNotiController->createNotiMid();
 		foreach ($this->triggers as $trigger)
 		{
 			if (!$oModuleModel->getTrigger($trigger[0], $trigger[1], $trigger[2], $trigger[3], $trigger[4]))
@@ -108,6 +120,9 @@ class noti extends ModuleObject
         }
         elseif(preg_match('/Firefox/i', $user_agent)) {
             $ub = "Firefox";
+        }
+        elseif(preg_match('/Edge?\//i', $user_agent)) {
+            $ub = "Edge";
         }
         elseif(preg_match('/Chrome/i', $user_agent)) {
             $ub = "Chrome";

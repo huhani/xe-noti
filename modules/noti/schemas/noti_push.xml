@@ -4,7 +4,7 @@
 	<column name="member_srl" type="number" size="11" default="0" notnull="notnull" index="idx_member_srl" />
 	<column name="nick_name" type="varchar" size="40" brief="알림 수신인 닉네임" />
 	<column name="type" type="varchar" size="25" notnull="notnull" />
-	<column name="notify" type="char" size="32" default="null" brief="메시지 ID" />
+	<column name="notify" type="char" size="32" default="null" brief="알림센터 메시지 ID" />
 
 	<column name="sender_member_srl" type="number" size="11" default="0" notnull="notnull" />
 	<column name="sender_nick_name" type="varchar" size="40" />

@@ -37,8 +37,11 @@ self.NotiStoreContainer = (function() {
             this._store = config.store;
             this._db = null;
             this._onUpgradeEnded = this.onUpgradeEnded.bind(this);
-
         }
+
+        NotiDB.isSupported = function() {
+            return 'indexedDB' in window && 'IDBTransaction' in window && 'IDBKeyRange' in window;
+        };
 
         NotiDB.prototype.getDBName = function() {
             return this._dbName;
@@ -221,6 +224,23 @@ self.NotiStoreContainer = (function() {
             });
         };
 
+        NotiDB.prototype.count = function(store) {
+            var that = this;
+            return this.open().then(function(db) {
+                return new Promise(function(resolve, reject) {
+                    var countRequest = db.transaction(store).objectStore(store).count();
+                    countRequest.onsuccess = function() {
+                        resolve(countRequest.result);
+                    };
+                    countRequest.onerror = function() {
+                        reject(void 0);
+                    };
+                })
+            }).catch (function() {
+                return Promise.reject("Unable to open IndexedDB.")
+            });
+        };
+
         NotiDB.prototype.clear = function(store) {
             var that = this;
             return this.open().then(function(db) {
@@ -280,13 +300,15 @@ self.NotiStoreContainer = (function() {
         function NotiStore(config) {
             if(config === void 0) {
                 config = {
-                    pushLogMaxCount: 100
+                    pushLogMaxCount: 1000
                 };
             }
 
             this._pushLogMaxCount = config.pushLogMaxCount;
             this._db = new NotiDB(INDEXEDDB_CONFIG);
         }
+
+        NotiStore.isSupported = NotiDB.isSupported;
 
         NotiStore.prototype.get = function(key) {
             return this._db.get(KEYVAL_STORE_NAME, key).then(function(result){
@@ -353,6 +375,28 @@ self.NotiStoreContainer = (function() {
             return this._db.get(PUSHLOG_NAME, pushSrl);
         };
 
+        NotiStore.prototype.getPushLogList = function(page, count) {
+            if(!page || page < 1) {
+                page = 1;
+            }
+            if(!count) {
+                count = 20;
+            }
+            var offset = Math.max(page-1, 0) * count;
+
+            return Promise.all([
+                this._db.count(PUSHLOG_NAME),
+                this._db.getList(PUSHLOG_NAME, null, 'prev', offset, count)
+            ]).then(function(result) {
+                return Promise.resolve({
+                    totalCount: result[0],
+                    lastPage: Math.ceil(result[0] / count),
+                    currentPage: page,
+                    data: result[1]
+                });
+            });
+        };
+
         NotiStore.prototype.insertPushLog = function(payload) {
             if(!payload || !payload.push_srl) {
                 return Promise.resolve(void 0);
@@ -367,6 +411,18 @@ self.NotiStoreContainer = (function() {
             };
 
             return this._db.put(PUSHLOG_NAME, data);
+        };
+
+        NotiStore.prototype.removeSubscribeConfig = function() {
+            return Promise.all([
+                this.clearPushLog(),
+                this._db.getList(KEYVAL_STORE_NAME, null, 'next', void 0, void 0, {
+                    action: 'delete',
+                    callback: function(keyValPair) {
+                        return keyValPair.key !== "enablePush";
+                    }
+                })
+            ]);
         };
 
         NotiStore.prototype.deletePushLog = function(pushSrl) {

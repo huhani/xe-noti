@@ -1,0 +1,125 @@
+
+.notiDebugContainer h2 {
+    font-size: 17px;
+    font-weight: bold;
+    color: #484848;
+}
+
+
+@media (min-width: 769px) {
+
+    .notiDebugContainer h2 {
+        margin: 0 0 10px 0;
+    }
+
+    .notiDebugTable {
+        width: 100%;
+        border-top: 1px solid #e4e4e4;
+        overflow: hidden;
+        margin: 0 0 45px 0;
+        font-size: 13px;
+        word-wrap: break-word;
+    }
+
+    .notiDebugTable table tbody tr {border-left: 1px solid #e4e4e4;}
+
+    .notiDebugTable table tbody tr th {
+        color: #555;
+        font-weight: 500;
+        font-size: 12px;
+        text-align: center;
+        word-break: keep-all;
+        padding: 10px 5px;
+        box-sizing: border-box;
+        border-right: 1px solid #e4e4e4;
+        border-bottom: 1px solid #e4e4e4;
+        background: #f7f8fc;
+    }
+
+    .notiDebugTable table tbody tr td {
+        text-align: left;
+        padding: 10px 8px;
+        font-size: 12px;
+        box-sizing: border-box;
+        border-right: 1px solid #e4e4e4;
+        border-bottom: 1px solid #e4e4e4;
+        background: #fff;
+    }
+    .notiDebugTable table {
+        width: 100%;
+        table-layout: fixed;
+        border-spacing: 0;
+        border-collapse: collapse;
+    }
+
+}
+
+@media (max-width: 768px) {
+
+    .notiDebugContainer h2 {
+        font-size: 13px;
+        margin: 0 0 10px 0;
+    }
+
+    .notiDebugTable {
+        width: 100%;
+        overflow: hidden;
+        margin: 0 0 30px 0;
+        font-size: 10px;
+    }
+
+    .notiDebugTable > table > tbody {
+        display: block;
+    }
+    .notiDebugTable > table {
+        width: 100%;
+        position: relative;
+        display: block;
+        table-layout: auto;
+        border-spacing: 0;
+        empty-cells: show;
+        border-collapse: separate;
+        border-bottom: 1px solid #ddd;
+    }
+    .notiDebugTable > table > tbody > tr {
+        display: block;
+        width: 100%;
+        overflow: hidden;
+    }
+    .notiDebugTable > table > tbody > tr > th {
+        display: block;
+        vertical-align: middle;
+        width: 30%;
+        float: left;
+        clear: left;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        color: #555;
+        font-weight: 500;
+        text-align: center;
+        word-break: keep-all;
+        padding: 12px 5px;
+        box-sizing: border-box;
+        border-top: 1px solid #e4e4e4;
+        font-size: 10px;
+    }
+    .notiDebugTable > table > tbody > tr > td {
+        display: block;
+        vertical-align: middle;
+        width: 70%;
+        float: left;
+        text-align: left;
+        font-size: 0.8rem;
+        line-height: 1.4;
+        padding: 12px 8px;
+        box-sizing: border-box;
+        border-top: 1px solid #e4e4e4;
+        font-size: 10px;
+    }
+
+    .notiDebugTable table th {
+        background: #F9F9F9;
+    }
+
+
+}

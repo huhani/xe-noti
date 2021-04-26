@@ -1,0 +1,142 @@
+<load target="css/endpointDebug.css" />
+<load target="js/debug.js" />
+
+
+<div class="notiDebug__container notiDebugContainer">
+
+    <div class="server-info__container" cond="isset($_SERVER)">
+        <h2>서버 정보</h2>
+        <div class="server-info notiDebugTable">
+            <table class="server-info-table">
+                <colgroup>
+                    <col width="20%">
+                    <col width="30%">
+                    <col width="20%">
+                    <col width="30%">
+                </colgroup>
+                <tbody>
+                    <tr>
+                        <th>모듈 상태</th>
+                        <td>
+
+                            <!--@if(array_key_exists('HTTP_X_FORWARDED_PROTO', $_SERVER) && $_SERVER['HTTP_X_FORWARDED_PROTO'] === "https")-->
+                                웹서버 HTTPS 미지원
+                            <!--@else if(!$isConfigFulfilled)-->
+                                모듈설정 미완료
+                            <!--@else if(!$notiConfig['use'])-->
+                                모듈 꺼짐
+                            <!--@else-->
+                                작동
+                            <!--@end-->
+
+                        </td>
+                        <th>Timestamp</th>
+                        <td>{date("Y-m-d H:i:s")}</td>
+                    </tr>
+                    <tr>
+                        <th>Public Key
+                            <BR>(urlsafe base64)</th>
+                        <td colspan="3" class="publicKey">{$notiConfig['Push']['vapidPublicKey']}</td>
+                    </tr>
+                    <tr>
+                        <th>Server ID</th>
+                        <td colspan="3" class="serverID">{$serverID ? $serverID : "-"}</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="client-info__container notiDebugContainer">
+        <h2>단말기 정보</h2>
+        <div class="client-info notiDebugTable">
+            <table class="client-info-table">
+                <colgroup>
+                    <col width="20%">
+                    <col width="30%">
+                    <col width="20%">
+                    <col width="30%">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <th>Servie Worker 상태</th>
+                    <td class="serviceWorkerStatus">-</td>
+                    <th>Notification 상태</th>
+                    <td class="notificationStatus">-</td>
+                </tr>
+                <tr>
+                    <th>Endpoint</th>
+                    <td colspan="3" class="endpoint">-</td>
+                </tr>
+                <tr>
+                    <th>Key</th>
+                    <td class="key">-</td>
+                    <th>Auth</th>
+                    <td class="auth">-</td>
+                </tr>
+                <tr>
+                    <th>Supported Encoding</th>
+                    <td class="supportedEncoding">-</td>
+                    <th>단말기 ID</th>
+                    <td class="endpointSrl">-</td>
+                </tr>
+                <tr>
+                    <th>User Agent</th>
+                    <td colspan="3" class="userAgent">{$_SERVER['HTTP_USER_AGENT']}</td>
+                </tr>
+                <tr>
+                    <th>작동여부</th>
+                    <td colspan="3" class="isValid">-</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="client-test__container notiDebugContainer">
+        <h2>단말기 테스트</h2>
+
+        <div class="client-test notiDebugTable">
+            <table class="server-info-table">
+                <colgroup>
+                    <col width="20%">
+                    <col width="30%">
+                    <col width="20%">
+                    <col width="30%">
+                </colgroup>
+                <tbody>
+                <tr>
+                    <th>구독</th>
+                    <td>
+                        <a href="javascript:;" class="subscribeBtn">subscribe</a>
+                    </td>
+                    <th>구독 해지</th>
+                    <td>
+                        <a href="javascript:;" class="unsubscribeBtn">unsubscribe</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>서비스 워커 삭제</th>
+                    <td>
+                        <a href="javascript:;" class="removeSWBtn">삭제</a>
+                    </td>
+                    <th>indexedDB 푸시로그 초기화</th>
+                    <td>
+                        <a href="javascript:;" class="resetIndexedDBBtn">초기화</a>
+                    </td>
+                </tr>
+                <tr>
+                    <th>푸시 테스트</th>
+                    <td>
+                        <a href="javascript:;" class="pushTestBtn">테스트</a>
+                    </td>
+                    <th>모든 알림 닫기</th>
+                    <td>
+                        <a href="javascript:;" class="closeAllNotificationBtn">닫기</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

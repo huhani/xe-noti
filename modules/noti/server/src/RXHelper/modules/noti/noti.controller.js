@@ -12,13 +12,16 @@ var NotiController = function() {
 
     __extend(NotiController, BaseClass);
 
-    NotiController.prototype.endpointSendCountUp = function(endpoint_srl) {
+    NotiController.prototype.endpointSendCountUp = function(endpoint_srl, failed) {
+        var date = helper.getDate();
         var query = "update ?? set send_count = send_count + 1, last_send = ? where endpoint_srl = ?";
-        return this.query(query, [
-            this.getDBPrefix() + "noti_endpoint",
-            helper.getDate(),
-            endpoint_srl
-        ])['catch'](function(err){
+        var args = [this.getDBPrefix() + "noti_endpoint", date, endpoint_srl];
+        if(failed) {
+            query = "update ?? set send_count = send_count + 1, fail_count = fail_count + 1, last_fail = ?, last_send = ? where endpoint_srl = ?";
+            args = [this.getDBPrefix() + "noti_endpoint", date, date, endpoint_srl];
+        }
+
+        return this.query(query, args)['catch'](function(err){
             console.error(err);
         });
     };
@@ -76,10 +79,10 @@ var NotiController = function() {
         var type = data.type;
         var module_srl = data.module_srl;
         var notify = data.notify;
-        var sender_member_srl = data.sender_member_srl;
+        var sender_member_srl = data.sender_member_srl || 0;
         var sender_nick_name = data.sender_nick_name;
         var sender_profile_image = data.sender_profile_image;
-        var receiver_member_srl = data.receiver_member_srl;
+        var receiver_member_srl = data.receiver_member_srl || 0;
         var receiver_nick_name = data.receiver_nick_name;
         var target_url = payload.launchUrl || data.target_url;
         var content_summary = payload.body || data.content_summary;
@@ -92,14 +95,10 @@ var NotiController = function() {
             if(response instanceof Error) {
                 var errorContent = {
                     error: true,
-                    name: response.name,
-                    message: response.message,
-                    stack: response.stack ? response.stack : null
+                    name: response.name
                 };
-                ['endpoint', 'statusCode'].forEach(function(each){
-                    if(response.hasOwnProperty(each)) {
-                        errorContent[each] = response[each];
-                    }
+                Object.getOwnPropertyNames(response).forEach(function(eachKey) {
+                    errorContent[eachKey] = response[eachKey];
                 });
                 push_response = JSON.stringify(errorContent);
             } else {

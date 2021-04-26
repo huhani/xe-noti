@@ -9,6 +9,16 @@
 class notiAdminView extends noti
 {
 	function init(){
+
+        $oModuleModel = getModel('module');
+        $oNotiModel = getModel('noti');
+        $notiInfo = $oModuleModel->getModuleInfoByMid('noti');
+        $notiConfig = $oNotiModel->getConfig();
+        $this->module_info = $notiInfo;
+
+
+        Context::set('showPushGroupMenu', !$notiConfig['simpleConfig']);
+
 		$this->setTemplatePath($this->module_path.'tpl');
 	}
 
@@ -49,6 +59,9 @@ class notiAdminView extends noti
         $notiConfig = $oNotiModel->getConfig();
         $pushGroupList = $oNotiModel->getPushGroupList(true);
         $ncenterliteConfig = $notiConfig['Ncenterlite'];
+        $ncenterliteTypeList = $oNotiModel->getNcenterliteTypeList();
+        Context::set('notiConfig', $notiConfig);
+        Context::set('ncenterliteTypeList', $ncenterliteTypeList);
 	    Context::set('ncenterliteConfig', $ncenterliteConfig);
         Context::set('pushGroupList', $pushGroupList);
 
@@ -56,6 +69,8 @@ class notiAdminView extends noti
     }
 
     function dispNotiAdminEndpointList() {
+        $oNotiModel = getModel('noti');
+        $notiConfig = $oNotiModel->getConfig();
         $oMemberModel = getModel('member');
         $search_target = Context::get('search_target');
         $search_keyword = Context::get('search_keyword');
@@ -84,7 +99,8 @@ class notiAdminView extends noti
                 $value->user_id = $oMemberInfo->user_id;
             }
         }
-        
+
+        Context::set('notiConfig', $notiConfig);
         Context::set('list', $output->data);
         Context::set('page_navigation', $output->page_navigation);
 
@@ -92,6 +108,8 @@ class notiAdminView extends noti
     }
 
     function dispNotiAdminPushLogList() {
+        $oNotiModel = getModel('noti');
+        $notiConfig = $oNotiModel->getConfig();
 	    $oMemberModel = getModel('member');
         $search_target = Context::get('search_target');
         $search_keyword = Context::get('search_keyword');
@@ -134,6 +152,7 @@ class notiAdminView extends noti
 
         $output = executeQueryArray('noti.getNotiPushList', $args);
 
+        Context::set('notiConfig', $notiConfig);
         Context::set('list', $output->data);
         Context::set('total_count', $output->total_count);
         Context::set('page_navigation', $output->page_navigation);
@@ -143,6 +162,7 @@ class notiAdminView extends noti
 
     function dispNotiAdminPushLogView() {
 	    $oNotiModel = getModel('noti');
+        $notiConfig = $oNotiModel->getConfig();
         $oMemberModel = getModel('member');
 	    $push_srl = Context::get('push_srl');
 	    $pushData = $oNotiModel->getPushLog($push_srl);
@@ -152,6 +172,7 @@ class notiAdminView extends noti
 	    $payloadData = $pushData && $pushData->push_payload ? @json_decode($pushData->push_payload) : null;
 	    $pushResponse = $pushData && $pushData->push_response ? @json_decode($pushData->push_response) : null;
 
+        Context::set('notiConfig', $notiConfig);
         Context::set('pushMemberInfo', $memberInfo);
         Context::set('pushSenderMemberInfo', $senderMemberInfo);
 	    Context::set('pushData', $pushData);
@@ -164,6 +185,7 @@ class notiAdminView extends noti
 
     function dispNotiAdminEndpointView() {
         $oNotiModel = getModel('noti');
+        $notiConfig = $oNotiModel->getConfig();
         $oMemberModel = getModel('member');
         $endpoint_srl = Context::get('endpoint_srl');
         $startDate = (int)Context::get('startDate');
@@ -180,6 +202,7 @@ class notiAdminView extends noti
 
         $endpointSummary = $oNotiModel->getEndpointSummary($endpoint_srl, $startDateYmdHis);
         $endpointData = $oNotiModel->getEndpoint($endpoint_srl);
+        $clientDetails = $endpointData && $endpointData->client_details ? @json_decode($endpointData->client_details) : null;
         $memberInfo = $endpointData ? $oMemberModel->getMemberInfoByMemberSrl($endpointData->member_srl) : null;
 
         $endpointSummary->lastClickDateTimeGap = null;
@@ -202,14 +225,20 @@ class notiAdminView extends noti
         $endpointSummary->avgClickTimeSinceReadStr = $this->secondToString($endpointSummary->avgClickTimeSinceRead);
         $endpointSummary->avgClickTimeStr = $this->secondToString($endpointSummary->avgClickTime);
 
+        Context::set('notiConfig', $notiConfig);
         Context::set('endpointMemberInfo', $memberInfo);
         Context::set('endpointData', $endpointData);
+        Context::set('clientDetails', $clientDetails);
         Context::set('endpointSummary', $endpointSummary);
 
         $this->setTemplateFile('endpointView');
     }
 
     function dispNotiAdminInspectView() {
+        $oNotiModel = getModel('noti');
+        $notiConfig = $oNotiModel->getConfig();
+        Context::set('notiConfig', $notiConfig);
+        
         $this->setTemplateFile('inspectView');
     }
 
@@ -251,14 +280,36 @@ class notiAdminView extends noti
 	    $manual_push_srl = Context::get('manual_push_srl');
 
         $oNotiModel = getModel('noti');
+        $notiConfig = $oNotiModel->getConfig();
         $pushGroupList = $oNotiModel->getPushGroupList(true);
         $totalEndpointCount = $oNotiModel->getEndpointCount();
         $manualPushLog = $oNotiModel->getManualPushLog($manual_push_srl);
 
+        Context::set('notiConfig', $notiConfig);
         Context::set('pushGroupList', $pushGroupList);
         Context::set('totalEndpointCount', $totalEndpointCount);
         Context::set('manualPush', $manualPushLog);
         $this->setTemplateFile('manualPushInsert');
+    }
+
+    function dispNotiAdminSkinConfig() {
+        Context::set('module_info', $this->module_info);
+
+        $oLayoutModel = getModel('layout');
+        $layout_list = $oLayoutModel->getLayoutList();
+        $mlayout_list = $oLayoutModel->getLayoutList(0, 'M');
+
+        Context::set('layout_list', $layout_list);
+        Context::set('mlayout_list', $mlayout_list);
+
+        $oModuleModel = getModel('module');
+        $skin_list = $oModuleModel->getSkins($this->module_path);
+        Context::set('skin_list', $skin_list);
+
+        $mskin_list = $oModuleModel->getSkins($this->module_path, 'm.skins');
+        Context::set('mskin_list', $mskin_list);
+
+        $this->setTemplateFile('skinConfig');
     }
 
     function secondToString($second = 0, $gapMode = false) {

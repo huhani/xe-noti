@@ -4,7 +4,8 @@
 	<permissions />
 	<actions>
 
-		<action name="dispNotiDeviceList" type="view" />
+		<action name="dispNotiEndpointSubscribe" type="view" index="true" />
+		<action name="dispNotiEndpointDebug" type="view" />
 
 		<action name="getNotiServerKey" type="model" />
 		<action name="getNotiAdminPushLog" type="model" />
@@ -15,11 +16,13 @@
 		<action name="getNotiNotificationByServiceWorker" type="model" />
 		<action name="getNotiCheckUseDevice" type="model" />
 		<action name="getNotiPushDefaultMessage" type="model" />
+		<action name="getNotiCheckValidEndpoint" type="model" />
 
 		<action name="procNotiDeviceInsert" type="controller" />
 		<action name="procNotiDeviceDelete" type="controller" />
 		<action name="procNotiServiceWorkerEvent" type="controller" />
 		<action name="procNotiPushSubscriptionChange" type="controller" />
+		<action name="procNotiPushTest" type="controller" />
 
 
 
@@ -35,6 +38,9 @@
 		<action name="dispNotiAdminManualPushList" type="view" />
 		<action name="dispNotiAdminManualPushView" type="view" />
 		<action name="dispNotiAdminManualPushInsert" type="view" />
+		<action name="dispNotiAdminSkinConfig" type="view" />
+
+
 
 		<action name="procNotiAdminModuleConfig" type="controller" />
 		<action name="procNotiAdminNcenterliteConfig" type="controller" />
@@ -42,6 +48,7 @@
 		<action name="procNotiAdminPushGroupDelete" type="controller" />
 		<action name="procNotiAdminEndpointDelete" type="controller" />
 		<action name="procNotiAdminPushLogDelete" type="controller" />
+		<action name="procNotiAdminPushTest" type="controller" />
 		<action name="procNotiAdminMessageQueueServerTest" type="controller" />
 		<action name="procNotiAdminMessageQueuePurge" type="controller" />
 		<action name="procNotiAdminNodeExitRequest" type="controller" />
@@ -49,6 +56,7 @@
 		<action name="procNotiAdminPushLogDeleteByOptions" type="controller" />
 		<action name="procNotiAdminManualPushInsert" type="controller" />
 		<action name="procNotiAdminManualPushDelete" type="controller" />
+		<action name="procNotiAdminSkinConfig" type="controller" />
 	</actions>
 	<menus>
 		<menu name="noti" type="all">

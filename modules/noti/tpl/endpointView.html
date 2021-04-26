@@ -106,6 +106,13 @@
         </td>
     </tr>
 
+    <tr cond="$endpointData">
+        <th scope="col" class="nowr">시험용 푸시 알림 생성</th>
+        <td>
+            <a href="javascript:;" class="x_btn sendTestPush" data-endpoint-srl="{$endpointData->endpoint_srl}">시험용 알림 전송</a>
+        </td>
+    </tr>
+
     </tbody>
 </table>
 <BR>
@@ -129,7 +136,7 @@
         <td>
             <a href="#popup_menu_area" class="member_{$endpointData->member_srl}" onclick="return false">{$endpointData->nick_name}</a>
             <!--@if(endpointMemberInfo)-->
-            [{$endpointMemberInfo->user_id}]
+            [{$endpointData->member_srl > 0 ? $endpointMemberInfo->user_id : "비회원"}]
             <!--@else-->
             (탈퇴한 회원)
             <!--@end-->
@@ -163,15 +170,15 @@
         <td>{htmlspecialchars($endpointData->endpoint)}</td>
     </tr>
 
-    <tr>
+    <tr cond="!$notiConfig['simpleConfig']">
         <th scope="col" class="nowr">auth</th>
         <td>{htmlspecialchars($endpointData->auth)}</td>
     </tr>
-    <tr>
+    <tr cond="!$notiConfig['simpleConfig']">
         <th scope="col" class="nowr">key</th>
         <td>{htmlspecialchars($endpointData->key)}</td>
     </tr>
-    <tr>
+    <tr cond="!$notiConfig['simpleConfig']">
         <th scope="col" class="nowr">지원 인코딩</th>
         <td>{htmlspecialchars($endpointData->supported_encoding)}</td>
     </tr>
@@ -221,6 +228,173 @@
 </table>
 <BR>
 
+<block cond="!$notiConfig['simpleConfig'] && $clientDetails">
+    <h2>단말기 타임존</h2>
+    <table cond="$clientDetails" class="x_table x_table-striped x_table-hover">
+        <colgroup>
+            <col width="120">
+        </colgroup>
+        <tbody>
+        <tr>
+            <th scope="col" class="nowr">UTC 타임존</th>
+            <td>
+                {htmlspecialchars($clientDetails->utcTimeZone)}
+            </td>
+        </tr>
+        <tr>
+            <th scope="col" class="nowr">언어</th>
+            <td>
+                {htmlspecialchars($clientDetails->lang)}
+            </td>
+        </tr>
+
+        <tr>
+            <th scope="col" class="nowr">타임존</th>
+            <td>
+                {htmlspecialchars($clientDetails->timeZone)}
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+    <BR>
+</block>
+
+
+<block cond="0 && !$notiConfig['simpleConfig'] && $clientDetails && isset($clientDetails->connection)">
+    <h2>단말기 연결정보</h2>
+    <table class="x_table x_table-striped x_table-hover">
+        <colgroup>
+            <col width="120">
+        </colgroup>
+        <tbody>
+        <tr cond="$clientDetails->connection->type">
+            <th scope="col" class="nowr">type</th>
+            <td>
+                {htmlspecialchars($clientDetails->connection->type)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->connection->effectiveType">
+            <th scope="col" class="nowr">effectiveType</th>
+            <td>
+                {htmlspecialchars($clientDetails->connection->effectiveType)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->connection->downlink">
+            <th scope="col" class="nowr">downlink</th>
+            <td>
+                {htmlspecialchars($clientDetails->connection->downlink)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->connection->downlinkMax">
+            <th scope="col" class="nowr">downlinkMax</th>
+            <td>
+                {htmlspecialchars($clientDetails->connection->downlinkMax)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->connection->rtt">
+            <th scope="col" class="nowr">rtt</th>
+            <td>
+                {htmlspecialchars($clientDetails->connection->rtt)}
+            </td>
+        </tr>
+
+        </tbody>
+    </table>
+    <BR>
+</block>
+
+<block cond="0 && !$notiConfig['simpleConfig'] && $clientDetails && isset($clientDetails->screen)">
+    <h2>단말기 스크린</h2>
+    <table class="x_table x_table-striped x_table-hover">
+        <colgroup>
+            <col width="120">
+        </colgroup>
+        <tbody>
+        <tr cond="$clientDetails->screen->width">
+            <th scope="col" class="nowr">width</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->width)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->screen->height">
+            <th scope="col" class="nowr">height</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->height)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->screen->availWidth">
+            <th scope="col" class="nowr">availWidth</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->availWidth)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->screen->availHeight">
+            <th scope="col" class="nowr">availHeight</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->availHeight)}
+            </td>
+        </tr>
+
+        <tr cond="$clientDetails->screen->width && $clientDetails->screen->height && $clientDetails->screen->devicePixelRatio">
+            <th scope="col" class="nowr">resolution</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->width * $clientDetails->screen->devicePixelRatio)} x {htmlspecialchars($clientDetails->screen->height * $clientDetails->screen->devicePixelRatio)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->screen->devicePixelRatio">
+            <th scope="col" class="nowr">devicePixelRatio</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->devicePixelRatio)}
+            </td>
+        </tr>
+
+        <tr cond="isset($clientDetails->screen->touchscreen)">
+            <th scope="col" class="nowr">touchscreen</th>
+            <td>
+                {$clientDetails->screen->touchscreen ? 'Y' :'N'}
+            </td>
+        </tr>
+
+        <tr cond="$clientDetails->screen->colorDepth">
+            <th scope="col" class="nowr">colorDepth</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->colorDepth)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->screen->colorDepth">
+            <th scope="col" class="nowr">pixelDepth</th>
+            <td>
+                {htmlspecialchars($clientDetails->screen->pixelDepth)}
+            </td>
+        </tr>
+        <tr cond="$clientDetails->screen->supportedColorGamut">
+            <th scope="col" class="nowr">supportedColorGamut</th>
+            <td>
+                {@ $supportedColorGamut = array(); }
+                <!--@if(isset($clientDetails->screen->supportedColorGamut->srgb) && $clientDetails->screen->supportedColorGamut->srgb)-->
+                {@ $supportedColorGamut[] = "sRGB"; }
+                <!--@end-->
+                <!--@if(isset($clientDetails->screen->supportedColorGamut->p3) && $clientDetails->screen->supportedColorGamut->p3)-->
+                {@ $supportedColorGamut[] = "DCI-P3"; }
+                <!--@end-->
+                <!--@if(isset($clientDetails->screen->supportedColorGamut->rec2020) && $clientDetails->screen->supportedColorGamut->rec2020)-->
+                {@ $supportedColorGamut[] = "REC2020"; }
+                <!--@end-->
+                {implode(", ", $supportedColorGamut)}
+            </td>
+        </tr>
+
+
+
+
+
+        </tbody>
+    </table>
+    <BR>
+</block>
+
+
 
 <form action="./" method="post">
     <input type="hidden" name="error_return_url" value="{getUrl('act', 'dispNotiAdminEndpointList', 'endpoint_srl', '')}">
@@ -248,6 +422,19 @@
                 window.location.href = window.location.href.setQuery('startDate', $this.val());
             });
         });
+
+        $(document).on('click', '.sendTestPush', function(evt) {
+            var $target = $(evt.target);
+            var endpoint_srl = parseInt($target.attr('data-endpoint-srl'), 10);
+            if(!isNaN(endpoint_srl)) {
+                exec_json('noti.procNotiAdminPushTest', {
+                    endpoint_srl: endpoint_srl
+                }, function() {
+                    alert("해당 단말기로 시험용 푸시를 전송하였습니다.");
+                });
+            }
+        })
+
     })(window.jQuery);
 
 

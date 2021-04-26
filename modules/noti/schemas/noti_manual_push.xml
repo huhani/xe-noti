@@ -2,8 +2,8 @@
     <column name="manual_push_srl" type="number" size="11" primary_key="primary_key" />
     <column name="member_srl" type="number" size="11" default="0" notnull="notnull" index="idx_member_srl" />
     <column name="nick_name" type="varchar" size="40" />
-
-    <column name="type" type="varchar" size="25" default="unknown" notnull="notnull" />
+    <column name="target_device" type="varchar" size="25" default="unknown" notnull="notnull" />
+    <column name="type" type="varchar" size="80" />
     <column name="title" type="varchar" size="500" />
     <column name="content" type="text" />
     <column name="ipaddress" type="varchar" size="128" notnull="notnull" />

@@ -7,6 +7,7 @@
         <column name="member_srl" var="member_srl" notnull="notnull" default="0" filter="number" />
         <column name="nick_name" var="nick_name" notnull="notnull" />
         <column name="type" var="type" />
+        <column name="target_device" var="target_device" />
         <column name="title" var="title" />
         <column name="content" var="content" />
         <column name="ipaddress" var="ipaddress" />

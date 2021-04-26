@@ -7,20 +7,24 @@
 	<column name="user_agent" type="text" notnull="notnull" />
 	<column name="browser" type="varchar" size="10" notnull="notnull" brief="chrome, firefox, opera, etc.." />
 	<column name="platform" type="varchar" size="50" notnull="notnull" default="unknown" brief="win, linux, macos" />
+	<column name="client_details" type="text" />
 
-	<column name="endpoint_crc32" type="number" size="11" notnull="notnull" index="idx_reg_id_crc" />
+	<column name="endpoint_crc32" type="number" size="11" notnull="notnull" index="idx_endpoint_crc" />
 	<column name="endpoint" type="text" notnull="notnull" />
 	<column name="auth" type="varchar" size="500" />
 	<column name="key" type="varchar" size="500" />
-	<column name="supported_encoding" type="varchar" size="200" notnull="notnull"/>
+	<column name="supported_encoding" type="varchar" size="200" notnull="notnull" />
 
-	<column name="send_count" type="number" size="11" default="0" notnull="notnull" />
-	<column name="read_count" type="number" size="11" default="0" notnull="notnull" />
-	<column name="click_count" type="number" size="11" default="0" notnull="notnull" />
+	<column name="send_count" type="number" size="11" default="0" notnull="notnull" brief="푸시서버로 전송 시도 횟수" />
+	<column name="fail_count" type="number" size="11" default="0" notnull="notnull" brief="푸시서버로 전송 실패 횟수" />
+	<column name="read_count" type="number" size="11" default="0" notnull="notnull" brief="클라이언트 메세지 수신 횟수" />
+	<column name="click_count" type="number" size="11" default="0" notnull="notnull" brief="클라이언트 메세지 클릭 횟수" />
 	
-	<column name="last_send" type="date" />
-	<column name="last_read" type="date" />
-	<column name="last_click" type="date" />
+	<column name="last_send" type="date" brief="최근 마지막으로 보낸 푸시전송 시도 시각" />
+	<column name="last_fail" type="date" brief="최근 마지막으로 보낸 푸시전송 실패 시각" />
+	<column name="last_read" type="date" brief="최근 마지막으로 푸시를 수신한 시각" />
+	<column name="last_click" type="date" brief="최근 마지막으로 푸시를 클릭한 시각" />
 	<column name="last_update" notnull="notnull" type="date" />
 	<column name="regdate" notnull="notnull" type="date" index="idx_regdate" />
+
 </table>

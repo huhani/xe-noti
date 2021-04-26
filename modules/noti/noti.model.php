@@ -52,7 +52,7 @@ class notiModel extends noti
 
 	    $config = $this->getConfig();
 	    $endpointFilter = $config['Push']['endpointFilter'];
-	    $pattern = '/^https:\/\/((?:\.?(?:\w+|\*))+)/';
+	    $pattern = '/^https:\/\/((?:\.?(?:\w+|[*-]))+)/';
 	    preg_match($pattern, $endpoint, $hostname);
 	    if(!$hostname) {
 	        return false;
@@ -96,15 +96,26 @@ class notiModel extends noti
 	    return false;
     }
 
+    function isSupportedBrowser($userAgent = '') {
+	    $browserInfo = $this->getUserAgentInfo($userAgent);
+	    return in_array($browserInfo->browser, array('Chrome', 'Firefox', 'Opera', 'Edge'));
+    }
+
 	// !!!S
 
     function getNotiServerKey() {
         $moduleConfig = $this->getConfig();
         $publicVAPIDKey = $moduleConfig && array_key_exists('Push', $moduleConfig) ? $moduleConfig['Push']['vapidPublicKey'] : null;
 
+        $swModuleConfig = new stdClass();
+        $swModuleConfig->pushMessageType = $moduleConfig['pushMessageType'];
+        $swModuleConfig->memberToGuest = $moduleConfig['GuestPush']['memberToGuest'];
+
         $this->add('publicKey' , $publicVAPIDKey);
         $this->add('serverID', $this->getServerID());
-        $this->add('swVersion' , "0.0.1");
+        $this->add('swVersion' , "0.0.2");
+        $this->add('timestamp', time());
+        $this->add('config', $swModuleConfig);
     }
 
     function getServerID() {
@@ -112,7 +123,7 @@ class notiModel extends noti
         $publicVAPIDKey = $moduleConfig && array_key_exists('Push', $moduleConfig) ? $moduleConfig['Push']['vapidPublicKey'] : null;
         $privateVAPIDKey = $moduleConfig && array_key_exists('Push', $moduleConfig) ? $moduleConfig['Push']['vapidPrivateKey'] : null;
         if($publicVAPIDKey && $privateVAPIDKey) {
-            return md5($publicVAPIDKey + $privateVAPIDKey);
+            return md5($publicVAPIDKey . $privateVAPIDKey);
         }
 
         return null;
@@ -129,37 +140,36 @@ class notiModel extends noti
 	    $date = date("Y-m-d H:i:s");
 	    $ipaddress = $_SERVER['REMOTE_ADDR'];
 
+        $payloadType = new stdClass();
+        $payloadType->name = "unknown";
+        $payloadType->text = "미등록";
+        $payload = new stdClass();
         $search_keyword = array('[@site_name]', '[@date]', '[@ipaddress]');
         $search_replace = array( Context::getSiteTitle(), $date, $ipaddress);
         foreach($UnknownPushConfig as $key=>$value){
-            if(is_string($value)) {
-                $UnknownPushConfig[$key] = str_replace($search_keyword, $search_replace, $value);
-            }
+            $payload->{$key} = is_string($value) ? str_replace($search_keyword, $search_replace, $value) : $value;
         }
 
-	    $payload = new stdClass();
+        unset($payload->name);
+        unset($payload->topic);
+        unset($payload->urgency);
+        unset($payload->__arrType);
         $payload->push_srl = 0;
-        $payload->name = "unknown";
-	    $payload->title = $UnknownPushConfig['title'];
-	    $payload->body = $UnknownPushConfig['body'];
-	    $payload->launchUrl = $UnknownPushConfig['launchUrl'];
-	    $payload->icon = $UnknownPushConfig['icon'];
-	    $payload->image = $UnknownPushConfig['image'];
-        $payload->actions = $UnknownPushConfig['actions'];
-        $payload->badge = $UnknownPushConfig['badge'];
-        $payload->silent = $UnknownPushConfig['silent'];
-        $payload->vibrate = $UnknownPushConfig['vibrate'];
-        $payload->topic = $UnknownPushConfig['topip'];
-        $payload->renotify = $UnknownPushConfig['renotify'];
-        $payload->ttl = $UnknownPushConfig['ttl'];
-        $payload->urgency = $UnknownPushConfig['urgency'];
-        $payload->pushGroupSrl = $UnknownPushConfig['pushGroupSrl'];
-        $payload->pushGroup = $pushGroup;
         $payload->tag = $UnknownPushConfig['pushGroupSrl'];
+        $payload->type = $payloadType;
+        $payload->pushGroup = $pushGroup;
 
         echo(json_encode($payload));
 
         exit();
+    }
+
+    function getNotiCheckValidEndpoint() {
+	    $endpoint = Context::get("endpoint");
+	    $endpoint_srl = intval(Context::get("endpoint_srl"));
+
+	    $endpointInfo = $this->getNotiEndpointByCRC32($endpoint);
+	    $this->add('isValid', $endpointInfo && $endpointInfo->endpoint_srl === $endpoint_srl);
     }
 
     function getEndpointLastSendDate($endpoint_srl) {
@@ -382,7 +392,7 @@ class notiModel extends noti
                 return $pushGroup;
             }
         }
-        
+
         return $this->getDefaultPushGroup();
     }
 
@@ -414,7 +424,8 @@ class notiModel extends noti
             array('쪽지', 'message'),
             array('스크랩', 'scrap'),
             array('관리자 알림', 'admin_content'),
-            array('기타 알림', 'custom')
+            array('기타', 'custom'),
+            array('테스트', 'test')
         );
 
         return $ntenterliteTypeList;
@@ -430,7 +441,7 @@ class notiModel extends noti
             'image' => null,
             'actions' => array(),
             'badge' => '/modules/noti/tpl/img/badge.png',
-            'silent' => true,
+            'silent' => false,
             'requireInteraction' => true,
             'renotify' => true,
             'vibrate' => null,
@@ -453,7 +464,7 @@ class notiModel extends noti
 	    foreach($ncenterliteTypeList as $each) {
             $ncenterliteTypeConfig[$each[1]] = $this->getWebPushDefaultOption();
             $ncenterliteTypeConfig[$each[1]]['use'] = true;
-            $ncenterliteTypeConfig[$each[1]]['name'] = $each[0] . " 알림 - [@site_name]";
+            $ncenterliteTypeConfig[$each[1]]['title'] = $each[0] . " 알림 - [@site_name]";
             $ncenterliteTypeConfig[$each[1]]['body'] = '#[@nick_name] [@content_summary]';
             $ncenterliteTypeConfig[$each[1]]['launchUrl'] = '[@target_url]';
             $ncenterliteTypeConfig[$each[1]]['icon'] = '[@profile_image]';
@@ -462,7 +473,7 @@ class notiModel extends noti
         $ncenterliteTypeConfig['mention']['image'] = '[@image_without_default]';
         $ncenterliteTypeConfig['comment']['image'] = '[@image_without_default]';
         $ncenterliteTypeConfig['comment_comment']['image'] = '[@image_without_default]';
-        $ncenterliteTypeConfig['mention']['body'] = "[@nick_name]님이 '[@content_summary]'글에서 회원님을 호출하였습니다.";
+        $ncenterliteTypeConfig['mention']['body'] = "[@nick_name]님이 '[@content_summary]'[@type]에서 회원님을 호출하였습니다.";
         $ncenterliteTypeConfig['scrap']['body'] = "[@nick_name]님이 회원님의 '[@content_summary]'글을 스크랩하였습니다.";
         $ncenterliteTypeConfig['message']['body'] = "[@nick_name]님이 '[@content_summary]'라고 메세지를 보냈습니다.";
         $ncenterliteTypeConfig['vote']['body'] = "[@nick_name]님이 회원님의 '[@content_summary]' [@type]을 추천하였습니다.";
@@ -498,11 +509,12 @@ class notiModel extends noti
 
     function getMemberPushDefaultConfig() {
         $defaultWebPush = $this->getWebPushDefaultOption();
-        $defaultWebPush['body'] = "알림";
-        $defaultWebPush['title'] = "알림이 등록되었습니다";
+        $defaultWebPush['title'] = "알림이 등록되었습니다 - [@site_name]";
+        $defaultWebPush['body'] = "푸시알림이 설정되었습니다.";
+        $defaultWebPush['launchUrl'] = "[@noti_config_link]";
         $memberPushDefaultConfig = array();
         $memberPushDefaultConfig['allowInsert'] = true;
-        $memberPushDefaultConfig['sendInsertNotice'] = true;
+        $memberPushDefaultConfig['sendInsertNotice'] = false;
         $memberPushDefaultConfig['sendDeniedMember'] = true;
         $memberPushDefaultConfig['PushConfig'] = $defaultWebPush;
 
@@ -511,11 +523,13 @@ class notiModel extends noti
 
     function getGuestPushDefaultConfig() {
         $defaultWebPush = $this->getWebPushDefaultOption();
-        $defaultWebPush['body'] = "알림";
-        $defaultWebPush['title'] = "알림이 등록되었습니다";
+        $defaultWebPush['title'] = "알림이 등록되었습니다 - [@site_name]";
+        $defaultWebPush['body'] = "푸시알림이 설정되었습니다.";
+        $defaultWebPush['launchUrl'] = "[@noti_config_link]";
         $guestPushDefaultConfig = array();
         $guestPushDefaultConfig['allowInsert'] = true;
-        $guestPushDefaultConfig['sendInsertNotice'] = true;
+        $guestPushDefaultConfig['memberToGuest'] = true;
+        $guestPushDefaultConfig['sendInsertNotice'] = false;
         $guestPushDefaultConfig['PushConfig'] = $defaultWebPush;
 
         return $guestPushDefaultConfig;
@@ -523,31 +537,45 @@ class notiModel extends noti
 
     function getUnknownPushDefaultConfig() {
         $defaultWebPush = $this->getWebPushDefaultOption();
-        $defaultWebPush['body'] = "알림이 발송되었습니다 - [@site_name]";
-        $defaultWebPush['title'] = "[@date]:\n[@ipaddress]";
+        $defaultWebPush['title'] = "알림이 발송되었습니다 - [@site_name]";
+        $defaultWebPush['body'] = "[@date]:\n[@ipaddress]";
         $unknownPushDefaultConfig = array();
         $unknownPushDefaultConfig['PushConfig'] = $defaultWebPush;
 
         return $unknownPushDefaultConfig;
     }
 
+    function getTestPushDefaultConfig() {
+        $defaultWebPush = $this->getWebPushDefaultOption();
+        $defaultWebPush['title'] = "알림이 발송되었습니다 - [@site_name]";
+        $defaultWebPush['body'] = "테스트용 푸시입니다.\n[@date]";
+        $testPushDefaultConfig = array();
+        $testPushDefaultConfig['PushConfig'] = $defaultWebPush;
+
+        return $testPushDefaultConfig;
+    }
+
     function getDefaultConfig() {
 	    $config = array();
         $config['use'] = true;
-        $config['tryinsertIfLogin'] = false;
-        $config['tryinsertIfAutologin'] = false;
+        $config['simpleConfig'] = true;
+        $config['tryinsertIfLogin'] = true;
+        $config['tryinsertIfAutologin'] = true;
         $config['allowDebugPage'] = false;
-        $config['pushEventPassThrough'] = false;
         $config['thumbnailWidth'] = 512;
         $config['thumbnailHeight'] = 256;
+        $config['pushMessageType'] = "push";
         $config['default_image'] = '';
         $config['default_badge'] = '';
+        $config['browserPushLogMaxCount'] = 1000;
+        $config['addMemberMenu'] = true;
         $config['Push'] = $this->getPushDefaultConfig();
         $config['PushGroup'] = array();
         $config['MessageQueue'] = $this->getMessageQueueDefaultConfig();
         $config['MemberPush'] = $this->getMemberPushDefaultConfig();
         $config['GuestPush'] = $this->getGuestPushDefaultConfig();
         $config['UnknownPush'] = $this->getUnknownPushDefaultConfig();
+        $config['TestPush'] = $this->getTestPushDefaultConfig();
         $config['Ncenterlite'] = $this->getNcenterliteDefaultConfig();
 
 	    return $config;
@@ -556,20 +584,31 @@ class notiModel extends noti
     function getSubscribeNotificationPush($logged_member_info) {
         $config = $this->getConfig();
         $subscribeConfig = $logged_member_info ? $config['MemberPush'] : $config['GuestPush'];
+
+        $payloadType = new stdClass();
+        $payloadType->name = "subscribe_notification";
+        $payloadType->text = "푸시설정";
+
         $obj = new stdClass();
         $payload = new stdClass();
         $receiver_member_srl = $logged_member_info->member_srl;
         $receiver_nick_name = $logged_member_info ? $logged_member_info->nick_name : "Guest";
         $unset_keys = array('use', '__arrType');
+        $search_keyword = array('[@site_name]', '[@date]', '[@ipaddress]', '[@nick_name]', '[@noti_config_link]');
+        $search_replace = array(Context::getSiteTitle(), date("Y-m-d H:i:s"), $_SERVER['REMOTE_ADDR'], $receiver_nick_name, getUrl('', 'mid', 'noti'));
         foreach($subscribeConfig['PushConfig'] as $key=>$value){
             $payload->{$key} = $value;
+            if(is_string($value)) {
+                $payload->{$key} = str_replace($search_keyword, $search_replace, $value);
+            }
         }
         foreach($unset_keys as $each_keys) {
             if(isset($payload->{$each_keys})) {
                 unset($payload->{$each_keys});
             }
         }
-        
+        $payload->type = $payloadType;
+
         $obj->type = "subscribe_notification";
         $obj->module_srl = -1;
         $obj->sender_member_srl = -1;
@@ -722,8 +761,20 @@ class notiModel extends noti
             $target_srl = $ncenterliteNotification->target_srl;
         }
 
+        $payloadType = new stdClass();
+        $payloadType->name = $config_type;
+        $payloadType->text = "알림센터 알림";
+        foreach($this->getNcenterliteTypeList() as $eachType) {
+            if($eachType[1] === $config_type) {
+                $payloadType->text = $eachType[0];
+                break;
+            }
+        }
+
+
         $payload->tag = $pushGroupConfig['push_group_srl'];
         $payload->pushGroup = $pushGroup;
+        $payload->type = $payloadType;
 
         $obj->type = $config_type;
         $obj->module_srl = $module_srl;
@@ -737,6 +788,56 @@ class notiModel extends noti
         $obj->content_summary = $target_summary;
         $obj->document_srl = $document_srl;
         $obj->target_srl = $target_srl;
+        $obj->payload = $payload;
+
+        return $obj;
+    }
+
+    function getTestPush($memberInfo = null) {
+        $config = $this->getConfig();
+        $TestPush = $config['TestPush'];
+        $TestPushConfig = $TestPush['PushConfig'];
+        $pushGroup = $this->getPushGroup($TestPushConfig['pushGroupSrl']);
+        unset($pushGroup['name']);
+
+
+        $obj = new stdClass();
+        $payload = new stdClass();
+
+        $date = date("Y-m-d H:i:s");
+        $ipaddress = $_SERVER['REMOTE_ADDR'];
+
+        $search_keyword = array('[@site_name]', '[@date]', '[@ipaddress]');
+        $search_replace = array( Context::getSiteTitle(), $date, $ipaddress);
+        foreach($TestPushConfig as $key=>$value){
+            if(is_string($value)) {
+                $UnknownPushConfig[$key] = str_replace($search_keyword, $search_replace, $value);
+            }
+        }
+
+        foreach($TestPushConfig as $key=>$value){
+            $payload->{$key} = is_string($value) ? str_replace($search_keyword, $search_replace, $value) : $value;
+        }
+        $payloadType = new stdClass();
+        $payloadType->name = "test";
+        $payloadType->text = "테스트";
+        $payload->tag = $pushGroup['push_group_srl'];
+        $payload->pushGroup = $pushGroup;
+        $payload->type = $payloadType;
+        unset($payload->__arrType);
+
+        $obj->type = "test";
+        $obj->module_srl = -1;
+        $obj->notify = null;
+        $obj->sender_member_srl = -1;
+        $obj->sender_nick_name = "unknown";
+        $obj->sender_profile_image = null;
+        $obj->receiver_member_srl = $memberInfo ? $memberInfo->member_srl : 0;
+        $obj->receiver_nick_name = $memberInfo ? $memberInfo->nick_name : "Guest";
+        $obj->target_url = $payload->launchUrl;
+        $obj->content_summary = $payload->body;
+        $obj->document_srl = -1;
+        $obj->target_srl = -1;
         $obj->payload = $payload;
 
         return $obj;
