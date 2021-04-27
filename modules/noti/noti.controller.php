@@ -889,15 +889,15 @@ class notiController extends noti
             $channel->queue_purge($queueName);
         } catch(Exception $e) {
             $error = $e;
-        } finally {
-            if($channel) {
-                $channel->close();
-                $channel = null;
-            }
-            if($connection) {
-                $connection->close();
-                $connection = null;
-            }
+        }
+
+        if($channel) {
+            $channel->close();
+            $channel = null;
+        }
+        if($connection) {
+            $connection->close();
+            $connection = null;
         }
 
 	    return !$error;
