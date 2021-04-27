@@ -51,17 +51,19 @@ class notiAdminController extends noti
             } catch(Exception $e) {
                 debugPrint($e);
                 $diagnosisMessage = $e->getMessage();
-            } finally {
-                if($channel) {
-                    $channel->close();
-                    $channel = null;
-                }
-                if($connection) {
-                    $connection->close();
-                    $connection = null;
-                }
-                $completeTime = $this->microtimeFloat();
+            } 
+
+            if($channel) {
+                $channel->close();
+                $channel = null;
             }
+            if($connection) {
+                $connection->close();
+                $connection = null;
+            }
+            $completeTime = $this->microtimeFloat();
+
+
         }
         if($startTime) {
             $executeTime = round($completeTime - $startTime, 7);
