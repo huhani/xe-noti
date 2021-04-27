@@ -846,16 +846,17 @@ class notiController extends noti
 
         } catch(Exception $e) {
             $error = $e;
-        } finally {
-            if($channel) {
-                $channel->close();
-                $channel = null;
-            }
-            if($connection) {
-                $connection->close();
-                $connection = null;
-            }
         }
+
+        if($channel) {
+            $channel->close();
+            $channel = null;
+        }
+        if($connection) {
+            $connection->close();
+            $connection = null;
+        }
+
 
         $output = new BaseObject();
         if($error) {
