@@ -15,6 +15,7 @@
 		<column name="endpoint" var="endpoint" notnull="notnull" />
 		<column name="auth" var="auth" />
 		<column name="key" var="key" />
+		<column name="expiration_time" var="expiration_time" />
 		<column name="supported_encoding" var="supported_encoding" />
 		<column name="client_details" var="client_details" />
 		<column name="last_update" var="last_update" notnull="notnull" />

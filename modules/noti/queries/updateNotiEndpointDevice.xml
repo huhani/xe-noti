@@ -7,6 +7,7 @@
         <column name="endpoint_crc32" var="endpoint_crc32" notnull="notnull" />
         <column name="key" var="key" />
         <column name="auth" var="auth" />
+        <column name="expiration_time" var="expiration_time" default="null" />
         <column name="last_update" var="last_update" notnull="notnull" />
     </columns>
     <conditions>

@@ -754,6 +754,7 @@
                     endpoint : subscription.endpoint,
                     key: keys && keys.p256dh ? keys.p256dh : null,
                     auth: keys && keys.auth ? keys.auth : null,
+                    expirationTime: json ? json.expirationTime : null,
                     contentEncoding: contentEncoding
                 };
 

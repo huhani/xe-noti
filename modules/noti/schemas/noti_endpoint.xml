@@ -13,6 +13,7 @@
 	<column name="endpoint" type="text" notnull="notnull" />
 	<column name="auth" type="varchar" size="500" />
 	<column name="key" type="varchar" size="500" />
+	<column name="expiration_time" type="varchar" size="20" />
 	<column name="supported_encoding" type="varchar" size="200" notnull="notnull" />
 
 	<column name="send_count" type="number" size="11" default="0" notnull="notnull" brief="푸시서버로 전송 시도 횟수" />

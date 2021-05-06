@@ -324,9 +324,10 @@ self.addEventListener('install', function(event) {
 self.addEventListener('pushsubscriptionchange', function(evt) {
 	var data = new FormData();
 	data.append('oldEndpoint', evt.oldSubscription ? evt.oldSubscription.endpoint : null);
-	data.append('newEndpoint', evt.oldSubscription ? evt.newSubscription.endpoint : null);
-	data.append('key', evt.oldSubscription ? event.newSubscription.toJSON().keys.p256dh : null);
-	data.append('auth', evt.oldSubscription ? event.newSubscription.toJSON().keys.auth : null);
+	data.append('newEndpoint', evt.newSubscription ? evt.newSubscription.endpoint : null);
+	data.append('key', evt.newSubscription ? event.newSubscription.toJSON().keys.p256dh : null);
+	data.append('auth', evt.newSubscription ? event.newSubscription.toJSON().keys.auth : null);
+	data.append('expirationTime', evt.newSubscription ? event.newSubscription.toJSON().expirationTime : null);
 	event.waitUntil(
 		fetch('/index.php?act=procNotiPushSubscriptionChange', {
 			method: "POST",
@@ -341,6 +342,9 @@ self.addEventListener('pushsubscriptionchange', function(evt) {
 		}).then(function(data){
 			if(!data || data.endpoint_srl === -1) {
 				return notiStore.clear();
+			}
+			if(evt.oldSubscription) {
+				notiStore.set('endpoint', evt.newSubscription.endpoint);
 			}
 		})
 	);
