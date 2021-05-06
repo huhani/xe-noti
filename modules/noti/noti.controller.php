@@ -214,6 +214,7 @@ class notiController extends noti
         $logged_info = Context::get('logged_info');
         $endpoint = Context::get('endpoint');
         $supported_encoding = Context::get("contentEncoding");
+        $expiration_time = Context::get("expirationTime");
         $client_details = Context::get("clientDetails");
         $ipaddress = $_SERVER['REMOTE_ADDR'];
 
@@ -253,6 +254,7 @@ class notiController extends noti
         $args->key = Context::get("key");
         $args->auth = Context::get("auth");
         $args->supported_encoding = $supported_encoding_list;
+        $args->expiration_time = $expiration_time;
         $args->client_details = $client_details;
         $endpoint_srl = !$oEndpointInfo ? $this->insertDevice($args) : $this->updateDevice($oEndpointInfo->endpoint_srl, $args);
         if($endpoint_srl !== -1) {
@@ -322,6 +324,7 @@ class notiController extends noti
         $newEndpoint = Context::get('newEndpoint');
         $key = Context::get('key');
         $auth = Context::get('auth');
+        $expiration_time = Context::get("expirationTime");
         $endpoint_srl = -1;
 
         $oNotiModel = getModel('noti');
@@ -335,7 +338,7 @@ class notiController extends noti
                     return $output;
                 }
             } else {
-                $updateResult = $this->updateDeviceEndpoint($endpointData->endpoint_srl, $newEndpoint, $key, $auth);
+                $updateResult = $this->updateDeviceEndpoint($endpointData->endpoint_srl, $newEndpoint, $key, $auth, $expiration_time);
                 if($updateResult) {
                     $endpoint_srl = $endpointData->endpoint_srl;
                 }
@@ -381,6 +384,7 @@ class notiController extends noti
 	    $key = $this->getDefault($obj, "key", null);
 	    $auth = $this->getDefault($obj, "auth", null);
 	    $supported_encoding = $this->getDefault($obj, "supported_encoding", []);
+	    $expiration_time = $this->getDefault($obj, "expiration_time", null);
 	    $endpoint = $obj->endpoint;
 	    $browserInfo = $this->getUserAgentInfo($user_agent);
 	    $browser = $browserInfo->browser;
@@ -390,6 +394,9 @@ class notiController extends noti
             return -1;
         }
 
+        if($expiration_time && !is_numeric($expiration_time)) {
+            $expiration_time = null;
+        }
         $args = new stdClass();
         $args->endpoint_srl = getNextSequence();
         $args->member_srl = $member_srl;
@@ -399,6 +406,7 @@ class notiController extends noti
         $args->browser = $browser;
         $args->platform = $platform;
         $args->client_details = $client_details;
+        $args->expiration_time = $expiration_time;
         $args->endpoint_crc32 = $endpoint_crc32;
         $args->endpoint = $endpoint;
         $args->auth = $auth;
@@ -507,12 +515,17 @@ class notiController extends noti
     }
 
     function updateDevice($endpoint_srl = null, $obj = null) {
+        if($obj && isset($obj->expiration_time) && $obj->expiration_time && !is_numeric($obj->expiration_time)) {
+            $obj->expiration_time = null;
+        }
+
 	    $args = new stdClass();
         $args->endpoint_srl = $endpoint_srl;
         $args->endpoint = $obj && isset($obj->endpoint) ? $obj->endpoint : null;
         $args->endpoint_crc32 = $obj && isset($obj->endpoint) ? $this->getEndpointHash($obj->endpoint) : null;
         $args->key = $obj && isset($obj->key) ? $obj->key : null;
         $args->auth = $obj && isset($obj->auth) ? $obj->auth : null;
+        $args->expiration_time = $obj && isset($obj->expiration_time) ? $obj->expiration_time : null;
 	    $args->member_srl = $obj && isset($obj->member_srl) ? $obj->member_srl : 0;
         $args->nick_name = $obj && isset($obj->nick_name) ? $obj->nick_name : 0;
 	    $args->ipaddress = $obj && isset($obj->ipaddress) ? $obj->ipaddress : 0;
@@ -526,13 +539,17 @@ class notiController extends noti
         return $output->toBool() ? $endpoint_srl : -1;
     }
 
-    function updateDeviceEndpoint($endpoint_srl, $newEndpoint, $newKey, $newAuth) {
+    function updateDeviceEndpoint($endpoint_srl, $newEndpoint, $newKey, $newAuth, $expiration_time = null) {
+        if($expiration_time && !is_numeric($expiration_time)) {
+            $expiration_time = null;
+        }
 	    $args = new stdClass();
 	    $args->endpoint_srl = $endpoint_srl;
 	    $args->endpoint = $newEndpoint;
 	    $args->endpoint_crc32 = $this->getEndpointHash($newEndpoint);
 	    $args->key = $newKey;
 	    $args->auth = $newAuth;
+	    $args->expiration_time = $expiration_time;
         $args->last_update = date("YmdHis");
 	    $output = executeQuery('noti.updateNotiEndpointDevice', $args);
 
@@ -889,15 +906,15 @@ class notiController extends noti
             $channel->queue_purge($queueName);
         } catch(Exception $e) {
             $error = $e;
-        }
-
-        if($channel) {
-            $channel->close();
-            $channel = null;
-        }
-        if($connection) {
-            $connection->close();
-            $connection = null;
+        } finally {
+            if($channel) {
+                $channel->close();
+                $channel = null;
+            }
+            if($connection) {
+                $connection->close();
+                $connection = null;
+            }
         }
 
 	    return !$error;
