@@ -343,7 +343,7 @@ self.addEventListener('pushsubscriptionchange', function(evt) {
 			if(!data || data.endpoint_srl === -1) {
 				return notiStore.clear();
 			}
-			if(evt.oldSubscription) {
+			if(evt.newSubscription) {
 				notiStore.set('endpoint', evt.newSubscription.endpoint);
 			}
 		})
