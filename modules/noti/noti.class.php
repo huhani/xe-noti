@@ -106,6 +106,13 @@ class noti extends ModuleObject
         return md5($endpoint."20170505");
     }
 
+    // Rhymix2, XE1 호환용
+    function getDBNull() {
+	    return defined('RX_VERSION') && version_compare(RX_VERSION, '2.0', '>=') ?
+            new Rhymix\Framework\Parsers\DBQuery\NullValue :
+            null;
+    }
+
     function getDefault($obj, $key, $defaultValue) {
 	    return $obj && isset($obj->{$key}) && $obj->{$key} ? $obj->{$key} : $defaultValue;
     }

@@ -519,19 +519,24 @@ class notiController extends noti
             $obj->expiration_time = null;
         }
 
+        $user_agent = $this->getDefault($obj, "user_agent", $_SERVER["HTTP_USER_AGENT"]);
+        $browserInfo = $this->getUserAgentInfo($user_agent);
+        $browser = $browserInfo->browser;
+        $platform = $browserInfo->platform;
+
 	    $args = new stdClass();
         $args->endpoint_srl = $endpoint_srl;
         $args->endpoint = $obj && isset($obj->endpoint) ? $obj->endpoint : null;
         $args->endpoint_crc32 = $obj && isset($obj->endpoint) ? $this->getEndpointHash($obj->endpoint) : null;
         $args->key = $obj && isset($obj->key) ? $obj->key : null;
         $args->auth = $obj && isset($obj->auth) ? $obj->auth : null;
-        $args->expiration_time = $obj && isset($obj->expiration_time) ? $obj->expiration_time : null;
+        $args->expiration_time = $obj && isset($obj->expiration_time) && $obj->expiration_time ? $obj->expiration_time : $this->getDBNull();
 	    $args->member_srl = $obj && isset($obj->member_srl) ? $obj->member_srl : 0;
-        $args->nick_name = $obj && isset($obj->nick_name) ? $obj->nick_name : 0;
+        $args->nick_name = $obj && isset($obj->nick_name) && $obj->nick_name ? $obj->nick_name : $this->getDBNull();
 	    $args->ipaddress = $obj && isset($obj->ipaddress) ? $obj->ipaddress : 0;
         $args->user_agent = $obj && isset($obj->user_agent) ? $obj->user_agent : null;
-        $args->browser = $obj && isset($obj->browser) ? $obj->browser : null;
-        $args->platform = $obj && isset($obj->platform) ? $obj->platform : null;
+        $args->browser = $browser;
+        $args->platform = $platform;
         $args->client_details = $obj && isset($obj->client_details) ? $obj->client_details : null;
         $args->last_update = date("YmdHis");
         $output = executeQuery('noti.updateEndpointMemberByEndpointSrl', $args);
@@ -549,7 +554,7 @@ class notiController extends noti
 	    $args->endpoint_crc32 = $this->getEndpointHash($newEndpoint);
 	    $args->key = $newKey;
 	    $args->auth = $newAuth;
-	    $args->expiration_time = $expiration_time;
+	    $args->expiration_time = $expiration_time ? $expiration_time : $this->getDBNull();
         $args->last_update = date("YmdHis");
 	    $output = executeQuery('noti.updateNotiEndpointDevice', $args);
 
