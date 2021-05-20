@@ -328,7 +328,7 @@ self.addEventListener('pushsubscriptionchange', function(evt) {
 	data.append('key', evt.newSubscription ? event.newSubscription.toJSON().keys.p256dh : null);
 	data.append('auth', evt.newSubscription ? event.newSubscription.toJSON().keys.auth : null);
 	data.append('expirationTime', evt.newSubscription ? event.newSubscription.toJSON().expirationTime : null);
-	event.waitUntil(
+	evt.waitUntil(
 		fetch('/index.php?act=procNotiPushSubscriptionChange', {
 			method: "POST",
 			body: data,
